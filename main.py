@@ -26,7 +26,7 @@ def analyze():
     form.jsonFile.data.save('uploads/questions.json')
 
     texts=[]
-    with open('uploads/questions.json', 'r') as f:
+    with open('uploads/questions.json', 'r', encoding="utf-8") as f:
       data = json.load(f)
       texts = [data["data"]["tossups"][i]["text"] for i in range(len(data["data"]["tossups"]))]
     
@@ -45,7 +45,7 @@ def analyze():
       allWordExceptStopDist = nltk.FreqDist(w for w in allWords if len(w) > 2 and w.lower() not in stopwords)
       return [i[0] for i in allWordExceptStopDist.most_common(15)]
     
-    def common_bigrams(text, frequency=0.35):
+    def common_bigrams(text, frequency=0.28):
       bigram_measures = nltk.collocations.BigramAssocMeasures()
       
       # change this to read in your data
@@ -64,4 +64,4 @@ def analyze():
     data = (common_unigrams(text), common_bigrams(text))
   return render_template('analyze.html', form=form, data=data)
 
-app.run(host='0.0.0.0', port=81)
+# app.run(host='0.0.0.0', port=81)
