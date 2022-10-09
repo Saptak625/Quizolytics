@@ -1,0 +1,42 @@
+{% extends "template.html" %}
+{% block title %}Analyze{% endblock title %}
+{% block pageTitle %}Analysis{% endblock pageTitle %}
+{% block navLink %}analyze{% endblock navLink %}
+
+{% block body %}
+  {{ super() }}
+  <form method="POST" action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.jsonFile.label(class="form-control-label") }}
+        {% if form.jsonFile.errors %}
+            {{ form.jsonFile(class="form-control is-invalid") }}
+                {% for error in form.jsonFile.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.jsonFile(class="form-control mb-3") }}
+        {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+{% endblock body %}
+
+{% block results %}
+{{ super() }}
+<div class="text-center">
+<h3>Unigrams Clues(a.k.a Buzzwords): </h3>
+<ul class="list-group list-group-horizontal text-center justify-content-center my-2 mb-4">
+  {% for e in data[0] %}
+    <li class="list-group-item">{{e}}</li>
+  {% endfor %}
+</ul>
+<h3 class="mt-3">Bigrams Clues(By PMI Score): </h3>
+<ul class="list-group list-group-horizontal text-center justify-content-center my-2 mb-4">
+  {% for e in data[1] %}
+    <li class="list-group-item">{{e}}</li>
+  {% endfor %}
+</ul>
+</div>
+{% endblock results %}
