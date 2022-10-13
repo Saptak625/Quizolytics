@@ -1,8 +1,8 @@
-# The command that runs the program. Commented out because it is not run when the interpreter command is set
-# run = ["python3", "main.py"]
+# The command that runs the program. If the interpreter field is set, it will have priority and this run command will do nothing
+run = "python3 main.py"
+
 # The primary language of the repl. There can be others, though!
 language = "python3"
-# The main file, which will be shown by default in the editor.
 entrypoint = "main.py"
 # A list of globs that specify which files and directories should
 # be hidden in the workspace.
@@ -26,15 +26,13 @@ channel = "stable-21_11"
   ]
   env = { LD_LIBRARY_PATH = "$PYTHON_LD_LIBRARY_PATH" }
 
-# The environment variables needed to correctly start Python and use the
-# package proxy.
 [env]
 VIRTUAL_ENV = "/home/runner/${REPL_SLUG}/venv"
 PATH = "${VIRTUAL_ENV}/bin"
-PYTHONPATH="${VIRTUAL_ENV}/lib/python3.8/site-packages"
-REPLIT_POETRY_PYPI_REPOSITORY="https://package-proxy.replit.com/pypi/"
-MPLBACKEND="TkAgg"
-POETRY_CACHE_DIR="${HOME}/${REPL_SLUG}/.cache/pypoetry"
+PYTHONPATH = "${VIRTUAL_ENV}/lib/python3.10/site-packages"
+REPLIT_POETRY_PYPI_REPOSITORY = "https://package-proxy.replit.com/pypi/"
+MPLBACKEND = "TkAgg"
+POETRY_CACHE_DIR = "${HOME}/${REPL_SLUG}/.cache/pypoetry"
 
 # Enable unit tests. This is only supported for a few languages.
 [unitTest]
@@ -82,10 +80,7 @@ support = true
 
 # Configures the packager.
 [packager]
-# Search packages in PyPI.
 language = "python3"
-# Never attempt to install `unit_tests`. If there are packages that are being
-# guessed wrongly, add them here.
 ignoredPackages = ["unit_tests"]
 
   [packager.features]
@@ -94,6 +89,12 @@ ignoredPackages = ["unit_tests"]
   packageSearch = true
   # Enable guessing what packages are needed from the code.
   guessImports = true
+
+# These are the files that need to be preserved when this 
+# language template is used as the base language template
+# for Python repos imported from GitHub
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", ".config", "venv"]
 
 [languages]
 
