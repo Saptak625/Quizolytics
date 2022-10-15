@@ -12,22 +12,77 @@
         {% if form.jsonFile.errors %}
             {{ form.jsonFile(class="form-control is-invalid") }}
                 {% for error in form.jsonFile.errors %}
-                    <span>{{ error }}</span>
+                    <span class="invalid-feedback">{{ error }}</span>
                 {% endfor %}
-            </div>
         {% else %}
             {{ form.jsonFile(class="form-control mb-3") }}
         {% endif %}
-        {{ form.maxResults.label(class="form-control-label") }}
-        {% if form.maxResults.errors %}
-            {{ form.maxResults(class="form-control is-invalid") }}
-                {% for error in form.maxResults.errors %}
-                    <span>{{ error }}</span>
+      
+        {% if form.automatic.errors %}
+            {{ form.automatic(class="form-control is-invalid") }}
+                {% for error in form.automatic.errors %}
+                    <span class="invalid-feedback">{{ error }}</span>
                 {% endfor %}
             </div>
         {% else %}
-            {{ form.maxResults(class="form-control mb-3") }}
+            {{ form.automatic(class="form-check-input mb-3", type="checkbox", id="automatic") }}
         {% endif %}
+        {{ form.automatic.label(class="form-check-label me-3") }}
+      
+        <div class="ms-5">
+          <div id="automatic group">
+            {{ form.maxResults.label(class="form-control-label") }}
+            {% if form.maxResults.errors %}
+                {{ form.maxResults(class="form-control is-invalid") }}
+                    {% for error in form.maxResults.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ form.maxResults(class="form-control mb-3") }}
+            {% endif %}
+          </div>
+          <div id="nonautomatic group">
+            {{ form.unigramNum.label(class="form-control-label") }}
+            {% if form.unigramNum.errors %}
+                {{ form.unigramNum(class="form-control is-invalid") }}
+                    {% for error in form.unigramNum.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ form.unigramNum(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ form.bigramFreq.label(class="form-control-label") }}
+            {% if form.bigramFreq.errors %}
+                {{ form.bigramFreq(class="form-control is-invalid") }}
+                    {% for error in form.bigramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ form.bigramFreq(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ form.trigramFreq.label(class="form-control-label") }}
+            {% if form.trigramFreq.errors %}
+                {{ form.trigramFreq(class="form-control is-invalid") }}
+                    {% for error in form.trigramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ form.trigramFreq(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ form.quadgramFreq.label(class="form-control-label") }}
+            {% if form.quadgramFreq.errors %}
+                {{ form.quadgramFreq(class="form-control is-invalid") }}
+                    {% for error in form.quadgramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ form.quadgramFreq(class="form-control mb-3") }}
+            {% endif %}
+          </div>
+        </div>
     </div>
     {{ form.submit(class="btn btn-primary") }}
   </form>
@@ -35,6 +90,7 @@
 
 {% block results %}
 {{ super() }}
+<h5 class="lead text-center mb-4">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
 <div class="text-center">
 <h3>Unigrams Clues(a.k.a Buzzwords): </h3>
 {% if data[0] %}
@@ -48,6 +104,9 @@
     </div>
   </div>
   {% endfor %}
+</div>
+<div class="text-center">
+<button type="button" class="btn btn-primary mb-3 w-50" onclick="copyToClipboard(String.raw`{{data[4][0]}}`);">Copy Unigrams</button>
 </div>
 {% else %}
 <h5>No unigrams found!</h5>
@@ -65,6 +124,9 @@
   </div>
   {% endfor %}
 </div>
+<div class="text-center">
+<button type="button" class="btn btn-primary mb-3 w-50" onclick="copyToClipboard(String.raw`{{data[4][1]}}`);">Copy Bigrams</button>
+</div>
 {% else %}
 <h5>No bigrams found!</h5>
 {% endif %}
@@ -80,6 +142,9 @@
     </div>
   </div>
   {% endfor %}
+</div>
+<div class="text-center">
+<button type="button" class="btn btn-primary mb-3 w-50" onclick="copyToClipboard(String.raw`{{data[4][2]}}`);">Copy Trigrams</button>
 </div>
 {% else %}
 <h5>No Trigrams found!</h5>
@@ -97,8 +162,32 @@
   </div>
   {% endfor %}
 </div>
+<div class="text-center">
+<button type="button" class="btn btn-primary mb-3 w-50" onclick="copyToClipboard(String.raw`{{data[4][3]}}`);">Copy Quadgrams</button>
+</div>
 {% else %}
 <h5>No quadgrams found!</h5>
 {% endif %}
 </div>
 {% endblock results %}
+
+{% block script %}
+  <script>
+    const checkbox = document.getElementById('automatic');
+    const automatic = document.getElementById('automatic group');
+    const nonautomatic = document.getElementById('nonautomatic group');
+
+    function updateForm() {
+      if (checkbox.checked) {
+        automatic.style.display = 'block';
+        nonautomatic.style.display = 'none';
+      } else {
+        automatic.style.display = 'none';
+        nonautomatic.style.display = 'block';
+      }
+    }
+    updateForm();
+    
+    checkbox.addEventListener('click', updateForm);
+  </script>
+{% endblock script %}

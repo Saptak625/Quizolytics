@@ -29,7 +29,11 @@ def analyze():
     
     MAX_RESULTS = form.maxResults.data
     NUM_QUESTIONS = len(texts)
-    automatic = True #Will be added later release.
+    automatic = form.automatic.data
+    unigramNum = form.unigramNum.data
+    bigramFreq = form.bigramFreq.data
+    trigramFreq = form.trigramFreq.data
+    quadgramFreq = form.quadgramFreq.data
     
     # Replace separators and punctuation with spaces
     text = re.sub(r'[.!?,:;/\-\s]', ' ', ' '.join(texts))
@@ -109,16 +113,18 @@ def analyze():
       else:
         return func(text, frequency=frequency, otherWords=otherWords)
     
-    quadgrams = automatic_solving(common_quadgrams, text, automatic)
-    trigrams = automatic_solving(common_trigrams, text, automatic, otherWords=quadgrams)
-    bigrams = automatic_solving(common_bigrams, text, automatic, otherWords=quadgrams+trigrams)
-    unigrams = common_unigrams(text, num=MAX_RESULTS, otherWords=quadgrams+trigrams+bigrams)
+    quadgrams = automatic_solving(common_quadgrams, text, automatic, frequency=quadgramFreq)
+    trigrams = automatic_solving(common_trigrams, text, automatic, otherWords=quadgrams, frequency=trigramFreq)
+    bigrams = automatic_solving(common_bigrams, text, automatic, otherWords=quadgrams+trigrams, frequency=bigramFreq)
+    unigrams = common_unigrams(text, num=(MAX_RESULTS if automatic else unigramNum), otherWords=quadgrams+trigrams+bigrams)
     # print(unigrams)
     # print(bigrams)
     # print(trigrams)
     # print(quadgrams)
-  
-    data = (unigrams, bigrams, trigrams, quadgrams)
+
+    data = [unigrams, bigrams, trigrams, quadgrams]
+    stringData = ['\n'.join(i) for i in data]
+    data.append(stringData)
   return render_template('analyze.html', form=form, data=data)
 
-app.run(host='0.0.0.0', port=81)
+app.run(host='0.0.0.0', port=81, debug=True)
