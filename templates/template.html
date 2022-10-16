@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quizolytics - {% block title %}{% endblock title %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename = 'favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/5800fa36a9.js" crossorigin="anonymous"></script>
     {% block head %}{% endblock head %}
@@ -12,8 +13,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand ms-3" href="/">
-<!--       <img src="{{ url_for('static', filename = 'logo.png') }}" alt="Logo" width="50px"> -->
-      Quizolytics
+      <img src="{{ url_for('static', filename = 'quizolytics_logo.png') }}" alt="Logo" width="175px">
+<!--       Quizolytics -->
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
