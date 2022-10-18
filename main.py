@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, flash
 from forms import AnalyzeForm
 import json
 import re
-import os
 import nltk
 from nltk.collocations import *
 from nltk.tokenize.toktok import ToktokTokenizer
