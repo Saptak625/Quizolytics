@@ -93,14 +93,15 @@
 {{ super() }}
 {% if data != None %}
 <div id="data">
-  <h5 class="lead text-center mb-4">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
+  <h5 class="lead text-center">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
+  <h5 class="lead text-center mb-4">Copy any clue by simply clicking on the clue card!</h5>
   <div class="text-center">
   <h3>Unigrams Clues(a.k.a Buzzwords): </h3>
   {% if data[0] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[0] %}
     <div class="col-sm-2">
-      <div class="card h-100">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -119,7 +120,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[1] %}
     <div class="col-sm-2">
-      <div class="card h-100">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -138,7 +139,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[2] %}
     <div class="col-sm-2">
-      <div class="card h-100">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -157,7 +158,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[3] %}
     <div class="col-sm-2">
-      <div class="card h-100">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -203,6 +204,18 @@
       const spinner = document.getElementById("loadSpinner");
       spinner.parentElement.style.display = 'block';
       spinner.style.display = 'block';
+    }
+
+    function copyTooltip(ele, message){
+      copyToClipboard(String.raw`${message}`)
+      ele.setAttribute("data-bs-original-title", "Copied!");
+    }
+    
+    function hideTooltip(ele) {
+      if(ele.getAttribute("data-bs-original-title") == "Copied!"){
+        ele.click();
+        ele.setAttribute("data-bs-original-title", "Copy!");
+      }
     }
     
     {% if data != None %}
