@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, flash
-from forms import AnalyzeForm
+from flask import Flask, render_template
+from forms import AutomaticAnalyzeForm, ManualAnalyzeForm
 import json
 import re
 import nltk
-from nltk.collocations import *
+from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder, QuadgramCollocationFinder
 from nltk.tokenize.toktok import ToktokTokenizer
-from werkzeug.utils import secure_filename
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7b7e30111ddc1f8a5b1d80934d336798'
@@ -18,27 +18,59 @@ def index():
 
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
-    form = AnalyzeForm()
+    automaticForm = AutomaticAnalyzeForm()
+    manualForm = ManualAnalyzeForm()
+    showAutomatic = True
     data = None
+    formSubmit = False
+  
+    texts = None
+    MAX_RESULTS = None
+    NUM_QUESTIONS = None
+    automatic = None
+    unigramNum = None
+    bigramFreq = None
+    trigramFreq = None
+    quadgramFreq = None
 
-    if form.validate_on_submit():
-        filename = secure_filename(form.jsonFile.data.filename)
-        # form.jsonFile.data.save('tmp/questions.json')
-        form.jsonFile.data.seek(0)
-        data = json.loads(form.jsonFile.data.read())
+    if automaticForm.submit1.data:
+        formSubmit = True
+        categories = ['Literature' if automaticForm.literature.data else '', 'Science' if automaticForm.science.data else '', 'Fine Arts' if automaticForm.fineArts.data else '', 'History' if automaticForm.history.data else '', 'Current Events' if automaticForm.currentEvents.data else '', 'Geography' if automaticForm.geography.data else '', 'Religion' if automaticForm.religion.data else '', 'Mythology' if automaticForm.mythology.data else '', 'Philosophy' if automaticForm.philosophy.data else '', 'Social Science' if automaticForm.socialScience.data else '', 'Other Academic' if automaticForm.otherAcademic.data else '', 'Trash' if automaticForm.trash.data else '']
+        categories = [i for i in categories if i]
+        print(categories)
+        subcategories = [] #Add subcategories here.
+        payload = {"categories":categories,"subcategories":subcategories,"difficulties":[],"maxQueryReturnLength":"1000","queryString":automaticForm.query.data,"questionType":"tossup","randomize":False,"regex":False,"searchType":"answer","setName":""}
+
+        resp = requests.post('https://www.qbreader.org/api/query', json=payload)
+        texts = [i['question'] for i in resp.json()['tossups']['questionArray']]
+
+        MAX_RESULTS = automaticForm.analyzeDetails.maxResults.data
+        NUM_QUESTIONS = len(texts)
+        automatic = automaticForm.analyzeDetails.automatic.data
+        unigramNum = automaticForm.analyzeDetails.unigramNum.data
+        bigramFreq = automaticForm.analyzeDetails.bigramFreq.data
+        trigramFreq = automaticForm.analyzeDetails.trigramFreq.data
+        quadgramFreq = automaticForm.analyzeDetails.quadgramFreq.data
+
+    elif manualForm.submit2.data:
+        formSubmit = True
+        showAutomatic = False
+        manualForm.jsonFile.data.seek(0)
+        data = json.loads(manualForm.jsonFile.data.read())
         texts = [
             data["data"]["tossups"][i]["text"]
             for i in range(len(data["data"]["tossups"]))
         ]
 
-        MAX_RESULTS = form.maxResults.data
+        MAX_RESULTS = manualForm.analyzeDetails.maxResults.data
         NUM_QUESTIONS = len(texts)
-        automatic = form.automatic.data
-        unigramNum = form.unigramNum.data
-        bigramFreq = form.bigramFreq.data
-        trigramFreq = form.trigramFreq.data
-        quadgramFreq = form.quadgramFreq.data
+        automatic = manualForm.analyzeDetails.automatic.data
+        unigramNum = manualForm.analyzeDetails.unigramNum.data
+        bigramFreq = manualForm.analyzeDetails.bigramFreq.data
+        trigramFreq = manualForm.analyzeDetails.trigramFreq.data
+        quadgramFreq = manualForm.analyzeDetails.quadgramFreq.data
 
+    if formSubmit:
         # Replace separators and punctuation with spaces
         text = re.sub(r'[.!?,:;/\-\s]', ' ', ' '.join(texts))
         # Remove extraneous chars
@@ -47,43 +79,46 @@ def analyze():
 
         toktok = ToktokTokenizer()
         STOPWORDS = [
-            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
-            "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself',
-            'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her',
-            'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them',
-            'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom',
-            'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are',
-            'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
-            'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and',
-            'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at',
-            'by', 'for', 'with', 'about', 'against', 'between', 'into',
-            'through', 'during', 'before', 'after', 'above', 'below', 'to',
-            'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under',
+            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves',
+            'you', "you're", "you've", "you'll", "you'd", 'your', 'yours',
+            'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she',
+            "she's", 'her', 'hers', 'herself', 'it', "it's", 'its',
+            'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+            'what', 'which', 'who', 'whom', 'this', 'that', "that'll",
+            'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be',
+            'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
+            'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or',
+            'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for',
+            'with', 'about', 'against', 'between', 'into', 'through',
+            'during', 'before', 'after', 'above', 'below', 'to', 'from',
+            'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under',
             'again', 'further', 'then', 'once', 'here', 'there', 'when',
-            'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
-            'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
-            'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will',
-            'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll',
-            'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn',
-            "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't",
-            'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma',
-            'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't",
-            'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't",
-            'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"
+            'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few',
+            'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
+            'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't',
+            'can', 'will', 'just', 'don', "don't", 'should', "should've",
+            'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren',
+            "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn',
+            "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven',
+            "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn',
+            "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn',
+            "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won',
+            "won't", 'wouldn', "wouldn't"
         ]
         quizbowlKeywords = [
-            'title', 'character', 'points', 'work', 'novel', 'poem', 'book',
-            'name', 'story', 'man', 'one', 'narrator', 'novella', 'author',
-            'another', 'found', 'comes', 'come', 'called', 'poet', 'speaker',
-            'like', 'opens', 'includes', 'piece', 'begins', 'use', 'used',
-            'features', 'played', 'within', 'written', 'composer',
-            'protagonist', 'also', 'writer', 'argues', 'argued', 'brought',
-            'claims', 'discussed', 'part', 'ftp'
+            'title', 'character', 'points', 'work', 'novel', 'poem',
+            'book', 'name', 'story', 'man', 'one', 'narrator', 'novella',
+            'author', 'another', 'found', 'comes', 'come', 'called',
+            'poet', 'speaker', 'like', 'opens', 'includes', 'piece',
+            'begins', 'use', 'used', 'features', 'played', 'within',
+            'written', 'composer', 'protagonist', 'also', 'writer',
+            'argues', 'argued', 'brought', 'claims', 'discussed', 'part',
+            'ftp'
         ]
 
+        allWords = toktok.tokenize(text)
+        
         def common_unigrams(text, num=15, otherWords=[]):
-            allWords = toktok.tokenize(text)
-            allWordDist = nltk.FreqDist(w.lower() for w in allWords)
             #Remove stopwords or quizbowl indicators
             stopwords = STOPWORDS + quizbowlKeywords + otherWords
             allWordExceptStopDist = nltk.FreqDist(
@@ -96,7 +131,7 @@ def analyze():
             bigram_measures = nltk.collocations.BigramAssocMeasures()
 
             # change this to read in your data
-            finder = BigramCollocationFinder.from_words(toktok.tokenize(text))
+            finder = BigramCollocationFinder.from_words(allWords)
 
             # only bigrams that apper at certain frequency
             finder.apply_freq_filter(round(len(texts) * frequency))
@@ -113,7 +148,7 @@ def analyze():
             trigram_measures = nltk.collocations.TrigramAssocMeasures()
 
             # change this to read in your data
-            finder = TrigramCollocationFinder.from_words(toktok.tokenize(text))
+            finder = TrigramCollocationFinder.from_words(allWords)
 
             # only bigrams that apper at certain frequency
             finder.apply_freq_filter(round(len(texts) * frequency))
@@ -130,8 +165,7 @@ def analyze():
             quadgram_measures = nltk.collocations.QuadgramAssocMeasures()
 
             # change this to read in your data
-            finder = QuadgramCollocationFinder.from_words(
-                toktok.tokenize(text))
+            finder = QuadgramCollocationFinder.from_words(allWords)
 
             # only bigrams that apper at certain frequency
             finder.apply_freq_filter(round(len(texts) * frequency))
@@ -162,7 +196,9 @@ def analyze():
                 print(startingFrequency)
                 return results
             else:
-                return func(text, frequency=frequency, otherWords=otherWords)
+                return func(text,
+                            frequency=frequency,
+                            otherWords=otherWords)
 
         quadgrams = automatic_solving(common_quadgrams,
                                       text,
@@ -190,6 +226,12 @@ def analyze():
         data = [unigrams, bigrams, trigrams, quadgrams]
         stringData = ['\n'.join(i) for i in data]
         data.append(stringData)
-    return render_template('analyze.html', form=form, data=data)
+
+    return render_template('analyze.html',
+                           manualForm=manualForm,
+                           automaticForm=automaticForm,
+                           data=data,
+                           showAutomatic=showAutomatic)
+
 
 app.run(host='0.0.0.0', port=81, debug=True)

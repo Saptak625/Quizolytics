@@ -6,86 +6,276 @@
 {% block body %}
   {{ super() }}
   <h5>Download Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5>
-  <form method="POST" action="" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
+  <div class="text-center">
+    <div class="btn-group justify-content-center" role="group" aria-label="Basic radio toggle button group">
+      <input type="radio" class="btn-check" name="btnradio" id="autosearch" autocomplete="off" onclick="showAutomatic()">
+      <label class="btn btn-outline-primary" for="autosearch">Automatic Searching</label>
+      <input type="radio" class="btn-check" name="btnradio" id="manualsearch" autocomplete="off" onclick="showManual()">
+      <label class="btn btn-outline-primary" for="manualsearch">Manual Searching</label>
+    </div>
+  </div>
+  <form method="POST" action="" enctype="multipart/form-data" id="automaticForm" class="needs-validation" novalidate>
+    {{ automaticForm.hidden_tag() }}
     <div class="form-group">
-        {{ form.jsonFile.label(class="form-control-label") }}
-        {% if form.jsonFile.errors %}
-            {{ form.jsonFile(class="form-control is-invalid") }}
-                {% for error in form.jsonFile.errors %}
+        {{ automaticForm.query.label(class="form-control-label") }}
+        {% if automaticForm.query.errors %}
+            {{ automaticForm.query(class="form-control is-invalid") }}
+                {% for error in automaticForm.query.errors %}
                     <span class="invalid-feedback">{{ error }}</span>
                 {% endfor %}
         {% else %}
-            {{ form.jsonFile(class="form-control mb-3") }}
+            <div class="input-group mb-3">
+              {{ automaticForm.query(class="form-control form-control-lg") }}
+              {{ automaticForm.submit1(class="btn btn-primary btn-lg") }}
+            </div>
         {% endif %}
-      
-        {% if form.automatic.errors %}
-            {{ form.automatic(class="form-control is-invalid") }}
-                {% for error in form.automatic.errors %}
+        <div class="mb-3 text-center">
+          <label class="form-control-label mb-1" for="categories">Categories: </label>
+          <div class="btn-group d-block mb-2" role="group" id="categories">
+            {{ automaticForm.literature(class="btn-check", onclick="litSelect(this.checked)") }}
+            {{ automaticForm.literature.label(class="btn btn-outline-primary") }}
+  
+            {{ automaticForm.science(class="btn-check", onclick="sciSelect(this.checked)") }}
+            {{ automaticForm.science.label(class="btn btn-outline-danger") }}
+  
+            {{ automaticForm.fineArts(class="btn-check", onclick="faSelect(this.checked)") }}
+            {{ automaticForm.fineArts.label(class="btn btn-outline-warning") }}
+
+            {{ automaticForm.history(class="btn-check", onclick="hisSelect(this.checked)") }}
+            {{ automaticForm.history.label(class="btn btn-outline-success") }}
+            
+            {{ automaticForm.currentEvents(class="btn-check") }}
+            {{ automaticForm.currentEvents.label(class="btn btn-outline-success") }}
+            
+            {{ automaticForm.geography(class="btn-check") }}
+            {{ automaticForm.geography.label(class="btn btn-outline-success") }}
+            
+            {{ automaticForm.religion(class="btn-check") }}
+            {{ automaticForm.religion.label(class="btn btn-outline-info") }}
+            
+            {{ automaticForm.mythology(class="btn-check") }}
+            {{ automaticForm.mythology.label(class="btn btn-outline-info") }}
+  
+            {{ automaticForm.philosophy(class="btn-check") }}
+            {{ automaticForm.philosophy.label(class="btn btn-outline-info") }}
+            
+            {{ automaticForm.socialScience(class="btn-check") }}
+            {{ automaticForm.socialScience.label(class="btn btn-outline-info") }}
+            
+            {{ automaticForm.otherAcademic(class="btn-check") }}
+            {{ automaticForm.otherAcademic.label(class="btn btn-outline-secondary") }}
+            
+            {{ automaticForm.trash(class="btn-check") }}
+            {{ automaticForm.trash.label(class="btn btn-outline-secondary") }}
+          </div>
+          <label class="form-control-label mb-1" for="subcategories">Subcategories: </label>
+          <div class="btn-group d-block mb-2" role="group" id="subcategories">
+            {{ automaticForm.americanLit(class="btn-check") }}
+            {{ automaticForm.americanLit.label(class="btn btn-sm btn-outline-primary") }}
+
+            {{ automaticForm.britishLit(class="btn-check") }}
+            {{ automaticForm.britishLit.label(class="btn btn-sm btn-outline-primary") }}
+
+            {{ automaticForm.classicalLit(class="btn-check") }}
+            {{ automaticForm.classicalLit.label(class="btn btn-sm btn-outline-primary") }}
+
+            {{ automaticForm.worldLit(class="btn-check") }}
+            {{ automaticForm.worldLit.label(class="btn btn-sm btn-outline-primary") }}
+
+            {{ automaticForm.otherLit(class="btn-check") }}
+            {{ automaticForm.otherLit.label(class="btn btn-sm btn-outline-primary") }}
+
+            {{ automaticForm.biology(class="btn-check") }}
+            {{ automaticForm.biology.label(class="btn btn-sm btn-outline-danger") }}
+
+            {{ automaticForm.chemistry(class="btn-check") }}
+            {{ automaticForm.chemistry.label(class="btn btn-sm btn-outline-danger") }}
+
+            {{ automaticForm.physics(class="btn-check") }}
+            {{ automaticForm.physics.label(class="btn btn-sm btn-outline-danger") }}
+
+            {{ automaticForm.math(class="btn-check") }}
+            {{ automaticForm.math.label(class="btn btn-sm btn-outline-danger") }}
+
+            {{ automaticForm.otherSci(class="btn-check") }}
+            {{ automaticForm.otherSci.label(class="btn btn-sm btn-outline-danger") }}
+
+            {{ automaticForm.visualFA(class="btn-check") }}
+            {{ automaticForm.visualFA.label(class="btn btn-sm btn-outline-warning") }}
+
+            {{ automaticForm.auditoryFA(class="btn-check") }}
+            {{ automaticForm.auditoryFA.label(class="btn btn-sm btn-outline-warning") }}
+
+            {{ automaticForm.otherFA(class="btn-check") }}
+            {{ automaticForm.otherFA.label(class="btn btn-sm btn-outline-warning") }}
+
+            {{ automaticForm.americanHis(class="btn-check") }}
+            {{ automaticForm.americanHis.label(class="btn btn-sm btn-outline-success") }}
+
+            {{ automaticForm.ancientHis(class="btn-check") }}
+            {{ automaticForm.ancientHis.label(class="btn btn-sm btn-outline-success") }}
+
+            {{ automaticForm.europeanHis(class="btn-check") }}
+            {{ automaticForm.europeanHis.label(class="btn btn-sm btn-outline-success") }}
+
+            {{ automaticForm.worldHis(class="btn-check") }}
+            {{ automaticForm.worldHis.label(class="btn btn-sm btn-outline-success") }}
+
+            {{ automaticForm.otherHis(class="btn-check") }}
+            {{ automaticForm.otherHis.label(class="btn btn-sm btn-outline-success") }}
+          </div>
+          <div>
+            <button type="button" class="btn btn-dark" onclick="selectAll(false)">Unselect All</button>
+            <button type="button" class="btn btn-dark" onclick="selectAll(true)">Select All</button>
+          </div>
+        </div>
+      {% if automaticForm.analyzeDetails.automatic.errors %}
+            {{ automaticForm.analyzeDetails.automatic(class="form-control is-invalid") }}
+                {% for error in automaticForm.analyzeDetails.automatic.errors %}
                     <span class="invalid-feedback">{{ error }}</span>
                 {% endfor %}
             </div>
         {% else %}
-            {{ form.automatic(class="form-check-input mb-3", type="checkbox", id="automatic") }}
+            {{ automaticForm.analyzeDetails.automatic(class="form-check-input mb-3", type="checkbox", id="automatic.analyzeDetails.automatic") }}
         {% endif %}
-        {{ form.automatic.label(class="form-check-label me-3") }}
+        {{ automaticForm.analyzeDetails.automatic.label(class="form-check-label me-3") }}
       
         <div class="ms-5">
-          <div id="automatic group">
-            {{ form.maxResults.label(class="form-control-label") }}
-            {% if form.maxResults.errors %}
-                {{ form.maxResults(class="form-control is-invalid") }}
-                    {% for error in form.maxResults.errors %}
+          <div id="automatic automatic group">
+            {{ automaticForm.analyzeDetails.maxResults.label(class="form-control-label") }}
+            {% if automaticForm.analyzeDetails.maxResults.errors %}
+                {{ automaticForm.analyzeDetails.maxResults(class="form-control is-invalid") }}
+                    {% for error in automaticForm.analyzeDetails.maxResults.errors %}
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ form.maxResults(class="form-control mb-3") }}
+                {{ automaticForm.analyzeDetails.maxResults(class="form-control mb-3") }}
             {% endif %}
           </div>
-          <div id="nonautomatic group">
-            {{ form.unigramNum.label(class="form-control-label") }}
-            {% if form.unigramNum.errors %}
-                {{ form.unigramNum(class="form-control is-invalid") }}
-                    {% for error in form.unigramNum.errors %}
+          <div id="automatic nonautomatic group">
+            {{ automaticForm.analyzeDetails.unigramNum.label(class="form-control-label") }}
+            {% if automaticForm.analyzeDetails.unigramNum.errors %}
+                {{ automaticForm.analyzeDetails.unigramNum(class="form-control is-invalid") }}
+                    {% for error in automaticForm.analyzeDetails.unigramNum.errors %}
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ form.unigramNum(class="form-control mb-3") }}
+                {{ automaticForm.analyzeDetails.unigramNum(class="form-control mb-3") }}
             {% endif %}
 
-            {{ form.bigramFreq.label(class="form-control-label") }}
-            {% if form.bigramFreq.errors %}
-                {{ form.bigramFreq(class="form-control is-invalid") }}
-                    {% for error in form.bigramFreq.errors %}
+            {{ automaticForm.analyzeDetails.bigramFreq.label(class="form-control-label") }}
+            {% if automaticForm.analyzeDetails.bigramFreq.errors %}
+                {{ automaticForm.analyzeDetails.bigramFreq(class="form-control is-invalid") }}
+                    {% for error in automaticForm.analyzeDetails.bigramFreq.errors %}
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ form.bigramFreq(class="form-control mb-3") }}
+                {{ automaticForm.analyzeDetails.bigramFreq(class="form-control mb-3") }}
             {% endif %}
 
-            {{ form.trigramFreq.label(class="form-control-label") }}
-            {% if form.trigramFreq.errors %}
-                {{ form.trigramFreq(class="form-control is-invalid") }}
-                    {% for error in form.trigramFreq.errors %}
+            {{ automaticForm.analyzeDetails.trigramFreq.label(class="form-control-label") }}
+            {% if automaticForm.analyzeDetails.trigramFreq.errors %}
+                {{ automaticForm.analyzeDetails.trigramFreq(class="form-control is-invalid") }}
+                    {% for error in automaticForm.analyzeDetails.trigramFreq.errors %}
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ form.trigramFreq(class="form-control mb-3") }}
+                {{ automaticForm.analyzeDetails.trigramFreq(class="form-control mb-3") }}
             {% endif %}
 
-            {{ form.quadgramFreq.label(class="form-control-label") }}
-            {% if form.quadgramFreq.errors %}
-                {{ form.quadgramFreq(class="form-control is-invalid") }}
-                    {% for error in form.quadgramFreq.errors %}
+            {{ automaticForm.analyzeDetails.quadgramFreq.label(class="form-control-label") }}
+            {% if automaticForm.analyzeDetails.quadgramFreq.errors %}
+                {{ automaticForm.analyzeDetails.quadgramFreq(class="form-control is-invalid") }}
+                    {% for error in automaticForm.analyzeDetails.quadgramFreq.errors %}
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ form.quadgramFreq(class="form-control mb-3") }}
+                {{ automaticForm.analyzeDetails.quadgramFreq(class="form-control mb-3") }}
             {% endif %}
           </div>
         </div>
     </div>
-    {{ form.submit(class="btn btn-primary", onclick="loading()") }}
+  </form>
+  <form method="POST" action="" enctype="multipart/form-data" id="manualForm" class="needs-validation" novalidate>
+    {{ manualForm.hidden_tag() }}
+    <div class="form-group">
+        {{ manualForm.jsonFile.label(class="form-control-label") }}
+        {% if manualForm.jsonFile.errors %}
+            {{ manualForm.jsonFile(class="form-control is-invalid") }}
+                {% for error in manualForm.jsonFile.errors %}
+                    <span class="invalid-feedback">{{ error }}</span>
+                {% endfor %}
+        {% else %}
+            {{ manualForm.jsonFile(class="form-control mb-3") }}
+        {% endif %}
+      
+        {% if manualForm.analyzeDetails.automatic.errors %}
+            {{ manualForm.analyzeDetails.automatic(class="form-control is-invalid") }}
+                {% for error in manualForm.analyzeDetails.automatic.errors %}
+                    <span class="invalid-feedback">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ manualForm.analyzeDetails.automatic(class="form-check-input mb-3", type="checkbox", id="manual.analyzeDetails.automatic") }}
+        {% endif %}
+        {{ manualForm.analyzeDetails.automatic.label(class="form-check-label me-3") }}
+      
+        <div class="ms-5">
+          <div id="manual automatic group">
+            {{ manualForm.analyzeDetails.maxResults.label(class="form-control-label") }}
+            {% if manualForm.analyzeDetails.maxResults.errors %}
+                {{ manualForm.analyzeDetails.maxResults(class="form-control is-invalid") }}
+                    {% for error in manualForm.analyzeDetails.maxResults.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ manualForm.analyzeDetails.maxResults(class="form-control mb-3") }}
+            {% endif %}
+          </div>
+          <div id="manual nonautomatic group">
+            {{ manualForm.analyzeDetails.unigramNum.label(class="form-control-label") }}
+            {% if manualForm.analyzeDetails.unigramNum.errors %}
+                {{ manualForm.analyzeDetails.unigramNum(class="form-control is-invalid") }}
+                    {% for error in manualForm.analyzeDetails.unigramNum.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ manualForm.analyzeDetails.unigramNum(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ manualForm.analyzeDetails.bigramFreq.label(class="form-control-label") }}
+            {% if manualForm.analyzeDetails.bigramFreq.errors %}
+                {{ manualForm.analyzeDetails.bigramFreq(class="form-control is-invalid") }}
+                    {% for error in manualForm.analyzeDetails.bigramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ manualForm.analyzeDetails.bigramFreq(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ manualForm.analyzeDetails.trigramFreq.label(class="form-control-label") }}
+            {% if manualForm.analyzeDetails.trigramFreq.errors %}
+                {{ manualForm.analyzeDetails.trigramFreq(class="form-control is-invalid") }}
+                    {% for error in manualForm.analyzeDetails.trigramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ manualForm.analyzeDetails.trigramFreq(class="form-control mb-3") }}
+            {% endif %}
+
+            {{ manualForm.analyzeDetails.quadgramFreq.label(class="form-control-label") }}
+            {% if manualForm.analyzeDetails.quadgramFreq.errors %}
+                {{ manualForm.analyzeDetails.quadgramFreq(class="form-control is-invalid") }}
+                    {% for error in manualForm.analyzeDetails.quadgramFreq.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+            {% else %}
+                {{ manualForm.analyzeDetails.quadgramFreq(class="form-control mb-3") }}
+            {% endif %}
+          </div>
+        </div>
+    </div>
+    {{ manualForm.submit2(class="btn btn-primary") }}
   </form>
 {% endblock body %}
 
@@ -179,23 +369,6 @@
 
 {% block script %}
   <script>
-    const checkbox = document.getElementById('automatic');
-    const automatic = document.getElementById('automatic group');
-    const nonautomatic = document.getElementById('nonautomatic group');
-
-    function updateForm() {
-      if (checkbox.checked) {
-        automatic.style.display = 'block';
-        nonautomatic.style.display = 'none';
-      } else {
-        automatic.style.display = 'none';
-        nonautomatic.style.display = 'block';
-      }
-    }
-    updateForm();
-    
-    checkbox.addEventListener('click', updateForm);
-
     function loading() {
       const data = document.getElementById("data")
       if(data !== null){
@@ -205,6 +378,62 @@
       spinner.parentElement.style.display = 'block';
       spinner.style.display = 'block';
     }
+    
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+      'use strict'
+    
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      const forms = document.querySelectorAll('.needs-validation')
+    
+      // Loop over them and prevent submission
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          } else {
+            loading();
+          }
+    
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+    
+    const automaticCheckbox = document.getElementById('automatic.analyzeDetails.automatic');
+    const automaticAutomatic = document.getElementById('automatic automatic group');
+    const automaticNonautomatic = document.getElementById('automatic nonautomatic group');
+
+    function updateAutomaticForm() {
+      if (automaticCheckbox.checked) {
+        automaticAutomatic.style.display = 'block';
+        automaticNonautomatic.style.display = 'none';
+      } else {
+        automaticAutomatic.style.display = 'none';
+        automaticNonautomatic.style.display = 'block';
+      }
+    }
+    updateAutomaticForm();
+    
+    automaticCheckbox.addEventListener('click', updateAutomaticForm);
+    
+    const manualCheckbox = document.getElementById('manual.analyzeDetails.automatic');
+    const manualAutomatic = document.getElementById('manual automatic group');
+    const manualNonautomatic = document.getElementById('manual nonautomatic group');
+
+    function updateManualForm() {
+      if (manualCheckbox.checked) {
+        manualAutomatic.style.display = 'block';
+        manualNonautomatic.style.display = 'none';
+      } else {
+        manualAutomatic.style.display = 'none';
+        manualNonautomatic.style.display = 'block';
+      }
+    }
+    updateManualForm();
+    
+    manualCheckbox.addEventListener('click', updateManualForm);
 
     function copyTooltip(ele, message){
       copyToClipboard(String.raw`${message}`)
@@ -216,6 +445,66 @@
         ele.click();
         ele.setAttribute("data-bs-original-title", "Copy!");
       }
+    }
+
+    const automaticForm = document.getElementById("automaticForm");
+    const manualForm = document.getElementById("manualForm");
+    function showAutomatic() {
+      automaticForm.style.display = 'block';
+      manualForm.style.display = 'none';
+    }
+    {% if showAutomatic %}
+      showAutomatic();
+      document.getElementById("autosearch").checked = true;
+    {% else %}
+      showManual();
+      document.getElementById("manualsearch").checked = true;
+    {% endif %}
+    
+    function showManual() {
+      automaticForm.style.display = 'none';
+      manualForm.style.display = 'block';
+    }
+
+
+    const categories = document.getElementById("categories");
+    const subcategories = document.getElementById("subcategories");
+    
+    function selectAll(val) {
+      for(let i in categories.children){
+        categories.children[i].checked=val;
+      }
+      for(let i in subcategories.children){
+        subcategories.children[i].checked=val;
+      }
+    }
+
+    function litSelect(val) {
+      const subIds = ["americanLit", "britishLit", "classicalLit", "worldLit", "otherLit"];
+      for(let i in subIds){
+        document.getElementById(subIds[i]).checked = val;
+      }      
+    }
+
+    function sciSelect(val) {
+      const subIds = ["biology", "chemistry", "physics", "math", "otherSci"];
+      for(let i in subIds){
+        document.getElementById(subIds[i]).checked = val;
+      }      
+    }
+
+    function faSelect(val) {
+      const subIds = ["visualFA", "auditoryFA", "otherFA"];
+      for(let i in subIds){
+        document.getElementById(subIds[i]).checked = val;
+      }      
+    }
+
+    function hisSelect(val) {
+      const subIds = ["americanHis", "ancientHis", "europeanHis", "worldHis", "otherHis"];
+      for(let i in subIds){
+        document.getElementById(subIds[i]).checked = val;
+      }      
     }
     
     {% if data != None %}
