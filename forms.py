@@ -31,6 +31,7 @@ class AutomaticAnalyzeForm(FlaskForm):
 
     americanLit = BooleanField("American", default="checked")
     britishLit = BooleanField("British", default="checked")
+    europeanLit = BooleanField("European", default="checked")
     classicalLit = BooleanField("Classical", default="checked")
     worldLit = BooleanField("World", default="checked")
     otherLit = BooleanField("Other", default="checked")

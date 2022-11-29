@@ -79,6 +79,9 @@
             {{ automaticForm.classicalLit(class="btn-check") }}
             {{ automaticForm.classicalLit.label(class="btn btn-sm btn-outline-primary") }}
 
+            {{ automaticForm.europeanLit(class="btn-check") }}
+            {{ automaticForm.europeanLit.label(class="btn btn-sm btn-outline-primary") }}
+
             {{ automaticForm.worldLit(class="btn-check") }}
             {{ automaticForm.worldLit.label(class="btn btn-sm btn-outline-primary") }}
 
@@ -282,6 +285,9 @@
 {% block results %}
 {{ super() }}
 {% if data != None %}
+{% if noResults %}
+<h3 class="text-center">No Questions matched Query.</h3>
+{% else %}
 <div id="data">
   <h5 class="lead text-center">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
   <h5 class="lead text-center mb-4">Copy any clue by simply clicking on the clue card!</h5>
@@ -364,6 +370,7 @@
   {% endif %}
   </div>
 </div>
+{% endif %}
 {% endif %}
 {% endblock results %}
 
