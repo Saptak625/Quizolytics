@@ -52,6 +52,7 @@ class AutomaticAnalyzeForm(FlaskForm):
     worldHis = BooleanField("World", default="checked")
     otherHis = BooleanField("Other", default="checked")
 
+    difficulty = StringField("Difficulty (1-10): ")
     analyzeDetails = FormField(AnalyzeDetailForm)
     submit1 = SubmitField('Search')
 

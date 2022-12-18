@@ -24,6 +24,7 @@ def analyze():
     data = None
     formSubmit = False
     noResults = False
+    questions = False
 
     texts = None
     MAX_RESULTS = None
@@ -80,10 +81,26 @@ def analyze():
             "Other Academic" if automaticForm.otherAcademic.data else '',
             "Trash" if automaticForm.trash.data else ''
         ]
+
+        difficultiesStr = automaticForm.difficulty.data
+        difficultiesSplit = difficultiesStr.split(',')
+        difficulties = [i for i in difficultiesSplit if '-' not in i]
+        for i in difficultiesSplit:
+            try:
+                if '-' in i:
+                    s = i.split('-')
+                    low = int(s[0].strip())
+                    high = int(s[1].strip())
+                    if low <= high:
+                        for num in range(low, high+1):
+                            difficulties.append(num)
+            except:
+                print(f'Was not able to parse difficulty {i}.')
+
         payload = {
             "categories": categories,
             "subcategories": subcategories,
-            "difficulties": [],
+            "difficulties": list(set(difficulties)),
             "maxQueryReturnLength": "1000",
             "queryString": automaticForm.query.data,
             "questionType": "tossup",
@@ -95,9 +112,10 @@ def analyze():
 
         resp = requests.post('https://www.qbreader.org/api/query',
                              json=payload)
-        texts = [
-            i['question'] for i in resp.json()['tossups']['questionArray']
+        questions = [
+            {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty') if info in i} for i in resp.json()['tossups']['questionArray']
         ]
+        texts = [i['question'] for i in questions]
 
         MAX_RESULTS = automaticForm.analyzeDetails.maxResults.data
         NUM_QUESTIONS = len(texts)
@@ -285,13 +303,15 @@ def analyze():
         else:
             noResults = True
             data = []
+            questions = []
 
     return render_template('analyze.html',
                            manualForm=manualForm,
                            automaticForm=automaticForm,
                            data=data,
                            showAutomatic=showAutomatic,
-                           noResults=noResults)
+                           noResults=noResults,
+                           questions=questions)
 
 
 app.run(host='0.0.0.0', port=81, debug=True)
