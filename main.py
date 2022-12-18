@@ -84,7 +84,7 @@ def analyze():
 
         difficultiesStr = automaticForm.difficulty.data
         difficultiesSplit = difficultiesStr.split(',')
-        difficulties = [i for i in difficultiesSplit if '-' not in i]
+        difficulties = [i for i in difficultiesSplit if i and '-' not in i]
         for i in difficultiesSplit:
             try:
                 if '-' in i:
