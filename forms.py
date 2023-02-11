@@ -58,6 +58,6 @@ class AutomaticAnalyzeForm(FlaskForm):
 
 
 class ManualAnalyzeForm(FlaskForm):
-    jsonFile = FileField("Upload JSON file from QuizDB: ", validators=[FileRequired(), FileAllowed(['json'], 'JSON only!')])
+    jsonFile = FileField("Upload JSON or TXT file: ", validators=[FileRequired(), FileAllowed(['json', 'txt'], 'JSON and TXT only!')])
     analyzeDetails = FormField(AnalyzeDetailForm)
     submit2 = SubmitField('Submit')

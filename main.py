@@ -110,8 +110,8 @@ def analyze():
             "setName": ""
         }
 
-        resp = requests.post('https://www.qbreader.org/api/query',
-                             json=payload)
+        resp = requests.get('https://www.qbreader.org/api/query',
+                             params=payload)
         questions = [
             {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty') if info in i} for i in resp.json()['tossups']['questionArray']
         ]
@@ -129,11 +129,26 @@ def analyze():
         formSubmit = True
         showAutomatic = False
         manualForm.jsonFile.data.seek(0)
-        data = json.loads(manualForm.jsonFile.data.read())
-        texts = [
-            data["data"]["tossups"][i]["text"]
-            for i in range(len(data["data"]["tossups"]))
-        ]
+        if manualForm.jsonFile.data.content_type == 'text/plain':
+            questions = []
+            q = []
+            for i in manualForm.jsonFile.data.read().decode('utf-8').split('\n'):
+                print(i)
+                print()
+                if i:
+                    q.append(i.strip(' \n'))
+                else:
+                    if q:
+                        questions.append({'setName': q[0], 'question': q[2], 'answer': q[3], 'category': q[4], 'subcategory': None, 'difficulty': None, 'formatted_answer': q[2]})
+                        q = []
+            texts = [i['question'] for i in questions]
+            print(texts)
+        else:
+            data = json.loads(manualForm.jsonFile.data.read())
+            texts = [
+                data["data"]["tossups"][i]["text"]
+                for i in range(len(data["data"]["tossups"]))
+            ]
 
         MAX_RESULTS = manualForm.analyzeDetails.maxResults.data
         NUM_QUESTIONS = len(texts)
@@ -313,5 +328,5 @@ def analyze():
                            noResults=noResults,
                            questions=questions)
 
-
-app.run(host='0.0.0.0', port=81, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=81, debug=True)
