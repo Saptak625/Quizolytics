@@ -133,16 +133,13 @@ def analyze():
             questions = []
             q = []
             for i in manualForm.jsonFile.data.read().decode('utf-8').split('\n'):
-                print(i)
-                print()
                 if i:
                     q.append(i.strip(' \n'))
                 else:
                     if q:
-                        questions.append({'setName': q[0], 'question': q[2], 'answer': q[3], 'category': q[4], 'subcategory': None, 'difficulty': None, 'formatted_answer': q[2]})
+                        questions.append({'setName': q[0], 'question': q[2], 'answer': q[3], 'category': q[4], 'subcategory': None, 'difficulty': None, 'formatted_answer': q[3]})
                         q = []
             texts = [i['question'] for i in questions]
-            print(texts)
         else:
             data = json.loads(manualForm.jsonFile.data.read())
             texts = [
