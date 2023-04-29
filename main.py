@@ -98,10 +98,10 @@ def analyze():
                 print(f'Was not able to parse difficulty {i}.')
 
         payload = {
-            "categories": categories,
-            "subcategories": subcategories,
-            "difficulties": list(set(difficulties)),
-            "maxQueryReturnLength": "1000",
+            "categories": ','.join(categories),
+            "subcategories": ','.join([i for i in subcategories if i]),
+            "difficulties": ','.join([str(i) for i in list(set(difficulties))]),
+            "maxReturnLength": 200,
             "queryString": automaticForm.query.data,
             "questionType": "tossup",
             "randomize": False,
@@ -112,6 +112,7 @@ def analyze():
 
         resp = requests.get('https://www.qbreader.org/api/query',
                              params=payload)
+        
         questions = [
             {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty') if info in i} for i in resp.json()['tossups']['questionArray']
         ]
