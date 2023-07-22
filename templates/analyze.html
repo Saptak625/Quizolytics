@@ -5,7 +5,7 @@
 
 {% block body %}
   {{ super() }}
-  <h5>Download Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5>
+  <h5>View Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5>
   <div class="text-center">
     <div class="btn-group justify-content-center" role="group" aria-label="Basic radio toggle button group">
       <input type="radio" class="btn-check" name="btnradio" id="autosearch" autocomplete="off" onclick="showAutomatic()">
@@ -303,7 +303,7 @@
   <h5 class="lead text-center">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
   <h5 class="lead text-center mb-4">Copy any clue by simply clicking on the clue card!</h5>
   <div class="text-center">
-  <h3>Unigrams Clues(a.k.a Buzzwords): </h3>
+  <h3>Unigrams Clues(By Frequency): </h3>
   {% if data[0] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[0] %}
