@@ -158,8 +158,27 @@ def analyze():
 
     if formSubmit:
         if NUM_QUESTIONS:
-            # Replace separators and punctuation with spaces
+             # Remove duplicate questions (the same question may appear, but with slightly different formatting)
+            # Use Levenshtein distance to determine similarity
+            print('Length Before: ', len(texts))
+            text_length_analyze = (sum([len(i) for i in texts]) // len(texts)) // 5
+            for i in range(len(texts)):
+                if not texts[i]:
+                    continue
+                for j in range(i + 1, len(texts)):
+                    edit_distance = nltk.edit_distance(texts[i][:text_length_analyze], texts[j][:text_length_analyze])
+                    if edit_distance < 0.15 * text_length_analyze:
+                        print(f'Removed {j+1}th because of {i+1}th: ', texts[j])
+                        questions[j] = None
+                        texts[j] = ''
+            questions = [i for i in questions if i]
+            texts = [i for i in texts if i]
+            print('Length After: ', len(texts))
+            
+            # Replace separators and punctuation with spaces.
             text = re.sub(r'[.!?,:;/\-\s]', ' ', ' '.join(texts))
+            text.replace('   ', ' ')
+            text.replace('  ', ' ')
             # Remove extraneous chars
             text = re.sub(r'[\\|@#“”*$&~%\(\)*\"]', '', text)
             text = text.lower()
