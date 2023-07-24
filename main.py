@@ -1,11 +1,13 @@
 from flask import Flask, render_template
-from forms import AutomaticAnalyzeForm, ManualAnalyzeForm
 import json
 import re
 import nltk
 from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder, QuadgramCollocationFinder
 from nltk.tokenize.toktok import ToktokTokenizer
 import requests
+
+from forms import AutomaticAnalyzeForm, ManualAnalyzeForm
+from lsh_minhash_jaccard_similarity import lsh_minhash_jaccard_similarity
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7b7e30111ddc1f8a5b1d80934d336798'
@@ -158,22 +160,23 @@ def analyze():
 
     if formSubmit:
         if NUM_QUESTIONS:
-             # Remove duplicate questions (the same question may appear, but with slightly different formatting)
-            # Use Levenshtein distance to determine similarity
-            print('Length Before: ', len(texts))
-            text_length_analyze = (sum([len(i) for i in texts]) // len(texts)) // 5
-            for i in range(len(texts)):
-                if not texts[i]:
-                    continue
-                for j in range(i + 1, len(texts)):
-                    edit_distance = nltk.edit_distance(texts[i][:text_length_analyze], texts[j][:text_length_analyze])
-                    if edit_distance < 0.15 * text_length_analyze:
-                        print(f'Removed {j+1}th because of {i+1}th: ', texts[j])
-                        questions[j] = None
-                        texts[j] = ''
-            questions = [i for i in questions if i]
-            texts = [i for i in texts if i]
-            print('Length After: ', len(texts))
+            # Remove duplicate questions (the same question may appear, but with slightly different formatting)
+            # Use LSH MinHash with Jaccard Similarity to find duplicates
+            import time
+            time_start = time.time()
+            duplicates = lsh_minhash_jaccard_similarity(texts)
+            print(f'Number of questions: {len(texts)}')
+            print(f'Number of duplicates: {len(duplicates)}')
+
+            # Remove duplicates from texts
+            # Find indices of duplicates
+            duplicate_indices = [texts.index(i2) for _, i2, _ in duplicates]
+
+            # Remove duplicates from texts and questions
+            texts = [i for j, i in enumerate(texts) if j not in duplicate_indices]
+            questions = [i for j, i in enumerate(questions) if j not in duplicate_indices]
+            time_end = time.time()
+            print(f'Time taken: {time_end - time_start:.2f} seconds\n')
             
             # Replace separators and punctuation with spaces.
             text = re.sub(r'[.!?,:;/\-\s]', ' ', ' '.join(texts))
@@ -345,5 +348,5 @@ def analyze():
                            noResults=noResults,
                            questions=questions)
 
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=81, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=81, debug=True)
