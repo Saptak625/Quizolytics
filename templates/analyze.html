@@ -308,7 +308,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[0] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -327,7 +327,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[1] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -346,7 +346,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[2] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -365,7 +365,7 @@
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[3] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="copyTooltip(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -474,13 +474,57 @@
     
     manualCheckbox.addEventListener('click', updateManualForm);
 
-    function copyTooltip(ele, message){
-      copyToClipboard(String.raw`${message}`)
-      ele.setAttribute("data-bs-original-title", "Copied!");
+    function ngramClick(ele, message) {
+      // Check if Shift key is down.
+      if (window.event.shiftKey) {
+        // Open a new analyze tab with the query as the ngram.
+        // Send a POST request to the analyze page with the query as the ngram.
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/analyze';
+        form.target = '_blank';
+        form.style.display = 'none';
+        const query = document.createElement('input');
+        query.type = 'text';
+        query.name = 'query';
+        query.value = message;
+        form.appendChild(query);
+        const categories = document.createElement('input');
+        categories.type = 'text';
+        categories.name = 'categories';
+        categories.value = 'all';
+        form.appendChild(categories);
+        const subcategories = document.createElement('input');
+        subcategories.type = 'text';
+        subcategories.name = 'subcategories';
+        subcategories.value = 'all';
+        form.appendChild(subcategories);
+        const difficulty = document.createElement('input');
+        difficulty.type = 'text';
+        difficulty.name = 'difficulty';
+        difficulty.value = '';
+        form.appendChild(difficulty);
+        const analyzeDetails = document.createElement('input'); 
+        analyzeDetails.type = 'checkbox';
+        analyzeDetails.name = 'analyzeDetails-automatic';
+        analyzeDetails.checked = true;
+        form.appendChild(analyzeDetails);
+        const maxResults = document.createElement('input');
+        maxResults.type = 'text';
+        maxResults.name = 'analyzeDetails-maxResults';
+        maxResults.value = '15';
+        analyzeDetails.appendChild(maxResults);
+        document.body.appendChild(form);
+        form.submit();
+        ele.setAttribute("data-bs-original-title", "Opened in new tab!");
+      } else {
+        copyToClipboard(String.raw`${message}`)
+        ele.setAttribute("data-bs-original-title", "Copied!");
+      }
     }
     
     function hideTooltip(ele) {
-      if(ele.getAttribute("data-bs-original-title") == "Copied!"){
+      if(ele.getAttribute("data-bs-original-title") == "Copied!" || ele.getAttribute("data-bs-original-title") == "Opened in new tab!"){
         ele.click();
         ele.setAttribute("data-bs-original-title", "Copy!");
       }
