@@ -384,7 +384,7 @@
 <h3 class="mt-3">Questions: </h3>
 <p class="text-muted m-2"><b>{{questions.__len__()}} Questions Found</b></p>
 {% for t in questions %}
-<div class="card m-2 mb-4" onclick="copyToClipboard(String.raw`{{t['_id']}}`); this.setAttribute('data-bs-original-title', 'Copied question id to clipboard: {{t['_id']}}')" data-bs-toggle="tooltip" title="Copy question id" data-bs-trigger="click" onmouseleave="hideTooltip(this)">
+<div class="card m-2 mb-4" onclick="questionClick(this, '{{t['_id']}}')" data-bs-toggle="tooltip" title="Copy question id" data-bs-trigger="click" onmouseleave="hideTooltip(this)">
     <div class="card-header">
         <b class="card-title">{{t['setName']}} | {{t['category']}} | {{t['subcategory']}} | {{t['difficulty']}}</b>
     </div>
@@ -522,14 +522,19 @@
         ele.setAttribute("data-bs-original-title", "Copied!");
       }
     }
+
+    function questionClick(ele, message) {
+      copyToClipboard(String.raw`${message}`)
+      ele.setAttribute("data-bs-original-title", String.raw`Copied question id to clipboard: ${message}`)
+    }
     
     function hideTooltip(ele) {
       if(ele.getAttribute("data-bs-original-title") == "Copied!" || ele.getAttribute("data-bs-original-title") == "Opened in new tab!" ){
         ele.click();
         ele.setAttribute("data-bs-original-title", "Copy!");
-      } else if (ele.getAttribute("data-bs-original-title").includes("question id")) {
+      } else if (ele.getAttribute("data-bs-original-title").includes("Copied question id")) {
+        ele.click();
         ele.setAttribute("data-bs-original-title", "Copy question id");
-  
       }
     }
     const automaticForm = document.getElementById("automaticForm");
