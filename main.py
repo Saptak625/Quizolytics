@@ -116,7 +116,7 @@ def analyze():
                              params=payload)
         
         questions = [
-            {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty') if info in i} for i in resp.json()['tossups']['questionArray']
+            {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty', '_id') if info in i} for i in resp.json()['tossups']['questionArray']
         ]
         texts = [i['question'] for i in questions]
 
