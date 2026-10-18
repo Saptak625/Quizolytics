@@ -5,7 +5,7 @@
 
 {% block body %}
   {{ super() }}
-  <h5>View Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5>
+  <!-- <h5>View Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5> -->
   <div class="text-center mb-3">
     <div class="btn-group justify-content-center" role="group" aria-label="Basic radio toggle button group">
       <input type="radio" class="btn-check" name="btnradio" id="autosearch" autocomplete="off" onclick="showAutomatic()">
@@ -32,6 +32,7 @@
         <div class="mb-4 text-center">
           <label class="form-control-label mb-1" for="categories">Categories: </label>
           <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#category-modal">Open Category Modal</button>
+          <span class="text-muted small ms-2" id="categorySummary"></span>
           <div class="d-none" id="categories">
             {{ automaticForm.literature(class="btn-check", id="literature") }}
             {{ automaticForm.science(class="btn-check", id="science") }}
@@ -68,10 +69,12 @@
             {{ automaticForm.worldHis(class="btn-check", id="worldHis") }}
             {{ automaticForm.otherHis(class="btn-check", id="otherHis") }}
           </div>
-          <input type="hidden" name="alternateSubcategories" id="alternateSubcategoriesField" value="">
+          <!-- Written by the category modal script. modalUsed=1 tells the backend to use these
+               three fields (empty = no filter) instead of the legacy checkboxes above. -->
+          <input type="hidden" name="modalUsed" id="modalUsedField" value="0">
           <input type="hidden" name="categories" id="categoriesField" value="">
           <input type="hidden" name="subcategories" id="subcategoriesField" value="">
-          
+          <input type="hidden" name="alternateSubcategories" id="alternateSubcategoriesField" value="">
         </div>
 
         {{ automaticForm.difficulty.label(class="form-control-label") }}
@@ -151,9 +154,9 @@
         </div>
     </div>
   </form>
-  <!-- Category Modal (qbreader-style) -->
-  <div class="modal modal-lg" id="category-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-scrollable">
+  <!-- Category Modal (qbreader-style). Columns are filled by script. -->
+  <div class="modal" id="category-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title me-2">Select Categories</h5>
@@ -164,15 +167,12 @@
           <div class="row">
             <div class="col-4" id="modal-categories">
               <h5 class="text-center">Category</h5>
-              <!-- Filled by script -->
             </div>
             <div class="col-4" id="modal-subcategories">
               <h5 class="text-center">Subcategory</h5>
-              <!-- Filled by script -->
             </div>
             <div class="col-4" id="modal-alt-subcategories">
               <h5 class="text-center">Alternate <span class="d-none d-lg-inline">Subcategory</span></h5>
-              <!-- Filled by script -->
             </div>
           </div>
         </div>
@@ -381,74 +381,54 @@
 
 {% block script %}
   <script>
-    // --- QBReader-like Category Modal ---
-    const CATEGORY_BUTTONS = [
-      ['Literature', 'primary'],
-      ['History', 'success'],
-      ['Science', 'danger'],
-      ['Fine Arts', 'warning'],
-      ['Religion', 'secondary'],
-      ['Mythology', 'secondary'],
-      ['Philosophy', 'secondary'],
-      ['Social Science', 'secondary'],
-      ['Current Events', 'secondary'],
-      ['Geography', 'secondary'],
-      ['Other Academic', 'secondary'],
-      ['Pop Culture', 'secondary']
+    // ------------------------------------------------------------------
+    // QBReader-like category modal
+    //
+    // The modal owns its own state. Whenever anything changes, all three
+    // hidden fields (categories / subcategories / alternateSubcategories)
+    // are rewritten together from that state and modalUsed is set to 1, so
+    // the backend never mixes modal values with the legacy checkboxes.
+    // ------------------------------------------------------------------
+    // subs: [label, id of matching legacy checkbox or null]
+    // sameName: QBReader subcategory has the same name as the category
+    //           (matches what the legacy checkbox path always sent)
+    const CATEGORY_GROUPS = [
+      { name: 'Literature', color: 'primary', formId: 'literature',
+        subs: [['American Literature', 'americanLit'], ['British Literature', 'britishLit'],
+               ['Classical Literature', 'classicalLit'], ['European Literature', 'europeanLit'],
+               ['World Literature', 'worldLit'], ['Other Literature', 'otherLit']],
+        alts: ['Drama', 'Long Fiction', 'Poetry', 'Short Fiction', 'Misc Literature'] },
+      { name: 'History', color: 'success', formId: 'history',
+        subs: [['American History', 'americanHis'], ['Ancient History', 'ancientHis'],
+               ['European History', 'europeanHis'], ['World History', 'worldHis'],
+               ['Other History', 'otherHis']],
+        alts: [] },
+      { name: 'Science', color: 'danger', formId: 'science',
+        subs: [['Biology', 'biology'], ['Chemistry', 'chemistry'], ['Physics', 'physics'],
+               ['Other Science', 'otherSci']],
+        alts: ['Math', 'Astronomy', 'Computer Science', 'Earth Science', 'Engineering', 'Misc Science'] },
+      { name: 'Fine Arts', color: 'warning', formId: 'fineArts',
+        subs: [['Visual Fine Arts', 'visualFA'], ['Auditory Fine Arts', 'auditoryFA'],
+               ['Other Fine Arts', 'otherFA']],
+        alts: ['Architecture', 'Dance', 'Film', 'Jazz', 'Musicals', 'Opera', 'Photography', 'Misc Arts'] },
+      { name: 'Religion', color: 'secondary', formId: 'religion', sameName: true, subs: [], alts: [] },
+      { name: 'Mythology', color: 'secondary', formId: 'mythology', sameName: true, subs: [], alts: [] },
+      { name: 'Philosophy', color: 'secondary', formId: 'philosophy', sameName: true, subs: [], alts: [] },
+      { name: 'Social Science', color: 'secondary', formId: 'socialScience', sameName: true, subs: [],
+        alts: ['Anthropology', 'Economics', 'Linguistics', 'Psychology', 'Sociology', 'Other Social Science'] },
+      { name: 'Current Events', color: 'secondary', formId: 'currentEvents', sameName: true, subs: [], alts: [] },
+      { name: 'Geography', color: 'secondary', formId: 'geography', sameName: true, subs: [], alts: [] },
+      { name: 'Other Academic', color: 'secondary', formId: 'otherAcademic', sameName: true, subs: [], alts: [] },
+      // Legacy checkbox is called "trash"; the modal uses QBReader's newer name.
+      { name: 'Pop Culture', color: 'secondary', formId: 'trash',
+        subs: [['Movies', null], ['Music', null], ['Sports', null], ['Television', null],
+               ['Video Games', null], ['Other Pop Culture', null]],
+        alts: [] }
     ];
-    const SUBCATEGORY_BUTTONS = [
-      ['American Literature', 'primary'],
-      ['British Literature', 'primary'],
-      ['Classical Literature', 'primary'],
-      ['European Literature', 'primary'],
-      ['World Literature', 'primary'],
-      ['Other Literature', 'primary'],
-      ['American History', 'success'],
-      ['Ancient History', 'success'],
-      ['European History', 'success'],
-      ['World History', 'success'],
-      ['Other History', 'success'],
-      ['Biology', 'danger'],
-      ['Chemistry', 'danger'],
-      ['Physics', 'danger'],
-      ['Other Science', 'danger'],
-      ['Visual Fine Arts', 'warning'],
-      ['Auditory Fine Arts', 'warning'],
-      ['Other Fine Arts', 'warning'],
-      ['Movies', 'secondary'],
-      ['Music', 'secondary'],
-      ['Sports', 'secondary'],
-      ['Television', 'secondary'],
-      ['Video Games', 'secondary'],
-      ['Other Pop Culture', 'secondary']
-    ];
-    const ALTERNATE_SUBCATEGORY_BUTTONS = [
-      ['Drama', 'primary'],
-      ['Long Fiction', 'primary'],
-      ['Poetry', 'primary'],
-      ['Short Fiction', 'primary'],
-      ['Misc Literature', 'primary'],
-      ['Math', 'danger'],
-      ['Astronomy', 'danger'],
-      ['Computer Science', 'danger'],
-      ['Earth Science', 'danger'],
-      ['Engineering', 'danger'],
-      ['Misc Science', 'danger'],
-      ['Architecture', 'warning'],
-      ['Dance', 'warning'],
-      ['Film', 'warning'],
-      ['Jazz', 'warning'],
-      ['Musicals', 'warning'],
-      ['Opera', 'warning'],
-      ['Photography', 'warning'],
-      ['Misc Arts', 'warning'],
-      ['Anthropology', 'secondary'],
-      ['Economics', 'secondary'],
-      ['Linguistics', 'secondary'],
-      ['Psychology', 'secondary'],
-      ['Sociology', 'secondary'],
-      ['Other Social Science', 'secondary']
-    ];
+
+    // kind: 'cat' | 'sub' | 'alt'; g: group index; i: child index
+    const modalBox = (kind, g, i) =>
+      document.getElementById(i === undefined ? `modal-${kind}-${g}` : `modal-${kind}-${g}-${i}`);
 
     function renderCategoryModal() {
       const catRoot = document.getElementById('modal-categories');
@@ -456,225 +436,116 @@
       const altRoot = document.getElementById('modal-alt-subcategories');
       if (!catRoot || !subRoot || !altRoot) return;
 
-      const safeId = (label) => label.replace(/[^a-zA-Z0-9]+/g, '-');
-      const makeBtn = (id, label, color) => `
+      const makeBtn = (id, label, color, data) => `
         <div>
-          <input type="checkbox" class="btn-check" autocomplete="off" id="modal-${safeId(id)}">
-          <label class="btn btn-outline-${color} w-100 rounded-0 my-1" for="modal-${safeId(id)}">${label}<br/></label>
+          <input type="checkbox" class="btn-check" autocomplete="off" id="${id}" ${data}>
+          <label class="btn btn-outline-${color} w-100 rounded-0 my-1" for="${id}">${label}</label>
         </div>`;
 
-      // Fill columns
-      let html = '<h5 class="text-center">Category</h5>';
-      CATEGORY_BUTTONS.forEach(([label, color]) => {
-        html += makeBtn(label, label, color);
-      });
-      catRoot.innerHTML = html;
-
-      html = '<h5 class="text-center">Subcategory</h5>';
-      SUBCATEGORY_BUTTONS.forEach(([label, color]) => {
-        html += makeBtn(label, label, color);
-      });
-      subRoot.innerHTML = html;
-
-      html = '<h5 class="text-center">Alternate <span class="d-none d-lg-inline">Subcategory</span></h5>';
-      ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label, color]) => {
-        html += makeBtn(label, label, color);
-      });
-      altRoot.innerHTML = html;
-
-      // Sync checked state with main form
-      function syncFromForm() {
-        const setChecked = (label, checked) => {
-          const el = document.getElementById(`modal-${safeId(label)}`);
-          if (el) el.checked = checked;
-        };
-        Object.entries(categoryMap).forEach(([label, id]) => {
-          const formEl = document.getElementById(id);
-          if (formEl) setChecked(label, formEl.checked);
+      let catHtml = '<h5 class="text-center">Category</h5>';
+      let subHtml = '<h5 class="text-center">Subcategory</h5>';
+      let altHtml = '<h5 class="text-center">Alternate <span class="d-none d-lg-inline">Subcategory</span></h5>';
+      CATEGORY_GROUPS.forEach((group, g) => {
+        catHtml += makeBtn(`modal-cat-${g}`, group.name, group.color, `data-kind="cat" data-g="${g}"`);
+        group.subs.forEach(([label], i) => {
+          subHtml += makeBtn(`modal-sub-${g}-${i}`, label, group.color, `data-kind="sub" data-g="${g}" data-i="${i}"`);
         });
-        Object.entries(subMap).forEach(([label, id]) => {
-          const formEl = document.getElementById(id);
-          if (formEl) setChecked(label, formEl.checked);
+        group.alts.forEach((label, i) => {
+          altHtml += makeBtn(`modal-alt-${g}-${i}`, label, group.color, `data-kind="alt" data-g="${g}" data-i="${i}"`);
         });
-        // Alternate subcategories: read from hidden field
-        const selectedAlt = new Set((altField?.value || '').split(',').map(s => s.trim()).filter(Boolean));
-        ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label]) => setChecked(label, selectedAlt.has(label)));
-      }
+      });
+      catRoot.innerHTML = catHtml;
+      subRoot.innerHTML = subHtml;
+      altRoot.innerHTML = altHtml;
 
-      function bindHandlers() {
-        const toggle = (label, id) => {
-          const modalEl = document.getElementById(`modal-${safeId(label)}`);
-          const formEl = document.getElementById(id);
-          if (modalEl && formEl) {
-            modalEl.addEventListener('change', () => {
-              formEl.checked = modalEl.checked;
-              updateCategoryAndSubcategoryFields();
-            });
-          }
-        };
-        Object.entries(categoryMap).forEach(([label, id]) => toggle(label, id));
-        // When categories are toggled, cascade to subcategories like original logic
-        const handleCategoryCascade = (categoryLabel) => {
-          const modalEl = document.getElementById(`modal-${safeId(categoryLabel)}`);
-          if (!modalEl) return;
-          const targets = cascadeMap[categoryLabel] || [];
-          targets.forEach(lbl => {
-            const modalSub = document.getElementById(`modal-${safeId(lbl)}`);
-            if (modalSub) modalSub.checked = modalEl.checked;
-            const formId = subMap[lbl];
-            if (formId) {
-              const formEl = document.getElementById(formId);
-              if (formEl) formEl.checked = modalEl.checked;
-            }
-          });
-          const altTargets = cascadeMapAlt[categoryLabel] || [];
-          altTargets.forEach(lbl => {
-            const modalAlt = document.getElementById(`modal-${safeId(lbl)}`);
-            if (modalAlt) {
-              modalAlt.checked = modalEl.checked;
-              modalAlt.dispatchEvent(new Event('change'));
-            }
-          });
-        };
-        // Bind base subcategory toggles
-        Object.entries(subMap).forEach(([label, id]) => toggle(label, id));
-        // Extend category toggles to cascade and update hidden fields
-        Object.keys(cascadeMap).forEach(categoryLabel => {
-          const catEl = document.getElementById(`modal-${safeId(categoryLabel)}`);
-          if (catEl) {
-            catEl.addEventListener('change', () => {
-              handleCategoryCascade(categoryLabel);
-              // Update hidden fields for categories/subcategories
-              const selectedCats = [];
-              Object.keys(categoryMap).forEach((label) => {
-                const el = document.getElementById(`modal-${safeId(label)}`);
-                if (el?.checked) selectedCats.push(label);
-              });
-              const categoriesField = document.getElementById('categoriesField');
-              if (categoriesField) categoriesField.value = selectedCats.join(',');
-              const selectedSubs = [];
-              Object.keys(subMap).forEach((label) => {
-                const el = document.getElementById(`modal-${safeId(label)}`);
-                if (el?.checked) selectedSubs.push(label);
-              });
-              const subcategoriesField = document.getElementById('subcategoriesField');
-              if (subcategoriesField) subcategoriesField.value = selectedSubs.join(',');
-            });
-          }
+      // Initial state mirrors the legacy checkboxes (rendered once; the modal keeps its own state afterwards).
+      CATEGORY_GROUPS.forEach((group, g) => {
+        const catOn = !!document.getElementById(group.formId)?.checked;
+        modalBox('cat', g).checked = catOn;
+        group.subs.forEach(([, formId], i) => {
+          const legacy = formId ? document.getElementById(formId) : null;
+          modalBox('sub', g, i).checked = legacy ? legacy.checked : catOn;
         });
+        group.alts.forEach((_, i) => { modalBox('alt', g, i).checked = catOn; });
+      });
+      updateCategorySummary(computeCategoryFilters().cats);
 
-        // Alternate subcategory toggles -> write to hidden field and ensure parent category checked when needed
-        const altField = document.getElementById('alternateSubcategoriesField');
-        const altToCategory = (() => {
-          const m = {};
-          Object.entries(cascadeMapAlt).forEach(([cat, arr]) => arr.forEach(a => m[a] = cat));
-          return m;
-        })();
-        function updateAltField() {
-          const selected = [];
-          ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label]) => {
-            const el = document.getElementById(`modal-${safeId(label)}`);
-            if (el?.checked) selected.push(label);
-          });
-          if (altField) altField.value = selected.join(',');
+      // One delegated listener handles every checkbox in the modal.
+      document.getElementById('category-modal').addEventListener('change', (e) => {
+        const t = e.target;
+        if (!t.matches || !t.matches('input[data-kind]')) return;
+        const g = Number(t.dataset.g);
+        const group = CATEGORY_GROUPS[g];
+        if (t.dataset.kind === 'cat') {
+          // Category toggles cascade to all of its children.
+          group.subs.forEach((_, i) => { modalBox('sub', g, i).checked = t.checked; });
+          group.alts.forEach((_, i) => { modalBox('alt', g, i).checked = t.checked; });
+        } else if (t.checked) {
+          // Checking a child turns its parent category on.
+          modalBox('cat', g).checked = true;
+        } else {
+          // Unchecking the last child turns the parent off.
+          const anyChild = group.subs.some((_, i) => modalBox('sub', g, i).checked)
+            || group.alts.some((_, i) => modalBox('alt', g, i).checked);
+          if (!anyChild) modalBox('cat', g).checked = false;
         }
-        ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label]) => {
-          const el = document.getElementById(`modal-${safeId(label)}`);
-          if (el) el.addEventListener('change', () => {
-            // ensure parent category checked if any alternate is checked
-            const parent = altToCategory[label];
-            if (parent) {
-              const modalCat = document.getElementById(`modal-${safeId(parent)}`);
-              const formCatIdMap = {
-                'Literature': 'literature', 'Science': 'science', 'Fine Arts': 'fineArts', 'History': 'history', 'Social Science': 'socialScience'
-              };
-              const formCat = document.getElementById(formCatIdMap[parent]);
-              if (el.checked) {
-                if (modalCat) modalCat.checked = true;
-                if (formCat) formCat.checked = true;
-              }
-            }
-            updateAltField();
-          });
-        });
-        // initial field sync
-        updateAltField();
-        // categories/subcategories initial sync
-        (function initCatSubFields(){
-          const selectedCats = [];
-          Object.keys(categoryMap).forEach((label) => {
-            const el = document.getElementById(`modal-${safeId(label)}`);
-            if (el?.checked) selectedCats.push(label);
-          });
-          const categoriesField = document.getElementById('categoriesField');
-          if (categoriesField) categoriesField.value = selectedCats.join(',');
-          const selectedSubs = [];
-          Object.keys(subMap).forEach((label) => {
-            const el = document.getElementById(`modal-${safeId(label)}`);
-            if (el?.checked) selectedSubs.push(label);
-          });
-          const subcategoriesField = document.getElementById('subcategoriesField');
-          if (subcategoriesField) subcategoriesField.value = selectedSubs.join(',');
-        })();
-      }
+        updateCategoryFields();
+      });
 
-      syncFromForm();
-      bindHandlers();
-
-      const toggleAllBtn = document.getElementById('toggle-all');
-      if (toggleAllBtn) {
-        toggleAllBtn.onclick = () => {
-          const anyUnchecked = CATEGORY_BUTTONS.some(([label]) => !document.getElementById(`modal-${safeId(label)}`)?.checked)
-            || SUBCATEGORY_BUTTONS.some(([label]) => !document.getElementById(`modal-${safeId(label)}`)?.checked)
-            || ALTERNATE_SUBCATEGORY_BUTTONS.some(([label]) => !document.getElementById(`modal-${safeId(label)}`)?.checked);
-          const setAll = (checked) => ([_label]) => {
-            const el = document.getElementById(`modal-${safeId(_label)}`);
-            if (el) {
-              el.checked = checked;
-              el.dispatchEvent(new Event('change'));
-            }
-          };
-          CATEGORY_BUTTONS.forEach(setAll(anyUnchecked));
-          SUBCATEGORY_BUTTONS.forEach(setAll(anyUnchecked));
-          ALTERNATE_SUBCATEGORY_BUTTONS.forEach(setAll(anyUnchecked));
-          // reflect into form checkboxes
-          document.getElementById('categories').querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = anyUnchecked);
-          document.getElementById('subcategories').querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = anyUnchecked);
-          // update hidden alt field
-          const altField = document.getElementById('alternateSubcategoriesField');
-          if (altField) {
-            const selected = [];
-            ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label]) => {
-              const el = document.getElementById(`modal-${safeId(label)}`);
-              if (el?.checked) selected.push(label);
-            });
-            altField.value = selected.join(',');
-          }
-        };
-      }
+      document.getElementById('toggle-all').addEventListener('click', () => {
+        const boxes = [...document.querySelectorAll('#category-modal input[data-kind]')];
+        const checkAll = boxes.some(b => !b.checked);
+        boxes.forEach(b => { b.checked = checkAll; });
+        updateCategoryFields();
+      });
     }
 
-    // Build modal when shown
-    document.addEventListener('shown.bs.modal', (e) => {
-      if (e.target && e.target.id === 'category-modal') {
-        renderCategoryModal();
-      }
-    });
-    // Also rebuild state when the modal is about to hide to ensure hidden fields/checkboxes are up to date
-    document.addEventListener('hide.bs.modal', (e) => {
-      if (e.target && e.target.id === 'category-modal') {
-        const altField = document.getElementById('alternateSubcategoriesField');
-        if (altField) {
-          const selected = [];
-          const safeId = (label) => label.replace(/[^a-zA-Z0-9]+/g, '-');
-          ALTERNATE_SUBCATEGORY_BUTTONS.forEach(([label]) => {
-            const el = document.getElementById(`modal-${safeId(label)}`);
-            if (el?.checked) selected.push(label);
-          });
-          altField.value = selected.join(',');
+    // Derives the three API filters from the modal state.
+    // - categories: every checked category.
+    // - subcategories: for each checked category, its checked children (or all of them if none are
+    //   checked); "same name" categories contribute their own name. Every checked category
+    //   contributes, so QBReader's AND of category/subcategory never excludes a selected category.
+    // - alternateSubcategories: only for categories where a strict subset is selected. Selecting
+    //   all (or none) adds no alternate filter, so questions without an alternate subcategory
+    //   are not accidentally excluded.
+    function computeCategoryFilters() {
+      const cats = [], subs = [], alts = [];
+      CATEGORY_GROUPS.forEach((group, g) => {
+        if (!modalBox('cat', g).checked) return;
+        cats.push(group.name);
+        if (group.sameName) subs.push(group.name);
+        if (group.subs.length) {
+          let chosen = group.subs.filter((_, i) => modalBox('sub', g, i).checked).map(s => s[0]);
+          if (!chosen.length) chosen = group.subs.map(s => s[0]);
+          subs.push(...chosen);
         }
-      }
-    });
+        if (group.alts.length) {
+          const chosen = group.alts.filter((_, i) => modalBox('alt', g, i).checked);
+          if (chosen.length && chosen.length < group.alts.length) alts.push(...chosen);
+        }
+      });
+      return { cats, subs, alts };
+    }
+
+    function updateCategorySummary(cats) {
+      const el = document.getElementById('categorySummary');
+      if (!el) return;
+      el.textContent = (cats.length === 0 || cats.length === CATEGORY_GROUPS.length)
+        ? 'All categories'
+        : cats.join(', ');
+    }
+
+    function updateCategoryFields() {
+      const { cats, subs, alts } = computeCategoryFilters();
+      document.getElementById('categoriesField').value = cats.join(',');
+      document.getElementById('subcategoriesField').value = subs.join(',');
+      document.getElementById('alternateSubcategoriesField').value = alts.join(',');
+      document.getElementById('modalUsedField').value = '1';
+      updateCategorySummary(cats);
+    }
+
+    renderCategoryModal();
+
     function loading() {
       const data = document.getElementById("data")
       if(data !== null){

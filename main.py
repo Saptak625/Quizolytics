@@ -83,9 +83,6 @@ def analyze():
             "Other Academic" if automaticForm.otherAcademic.data else '',
             "Trash" if automaticForm.trash.data else ''
         ]
-        
-        # Read alternate subcategories (comma-separated) from hidden field
-        alt_subs = request.form.get('alternateSubcategories', '')
 
         difficultiesStr = automaticForm.difficulty.data
         difficultiesSplit = difficultiesStr.split(',')
@@ -102,14 +99,23 @@ def analyze():
             except:
                 print(f'Was not able to parse difficulty {i}.')
 
-        # Allow modal to override categories/subcategories via hidden fields if present
-        modal_categories = request.form.get('categories', '')
-        modal_subcategories = request.form.get('subcategories', '')
+        # The category modal is all-or-nothing: if it has been used (modalUsed == '1'),
+        # its three hidden fields are the single source of truth and an empty value
+        # means "no filter". Otherwise fall back to the legacy checkboxes. Mixing the
+        # two per-field produced contradictory category/subcategory pairs.
+        if request.form.get('modalUsed') == '1':
+            cat_str = request.form.get('categories', '')
+            sub_str = request.form.get('subcategories', '')
+            alt_str = request.form.get('alternateSubcategories', '')
+        else:
+            cat_str = ','.join(categories)
+            sub_str = ','.join([i for i in subcategories if i])
+            alt_str = ''
 
         payload = {
-            "categories": modal_categories if modal_categories else ','.join(categories),
-            "subcategories": modal_subcategories if modal_subcategories else ','.join([i for i in subcategories if i]),
-            "alternateSubcategories": alt_subs,
+            "categories": cat_str,
+            "subcategories": sub_str,
+            "alternateSubcategories": alt_str,
             "difficulties": ','.join([str(i) for i in list(set(difficulties))]),
             "maxReturnLength": 200,
             "queryString": automaticForm.query.data,
@@ -122,8 +128,7 @@ def analyze():
 
         resp = requests.get('https://www.qbreader.org/api/query',
                              params=payload)
-        print(payload)
-        
+
         questions = [
             {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty', '_id') if info in i} for i in resp.json()['tossups']['questionArray']
         ]
