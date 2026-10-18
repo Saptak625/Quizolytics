@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import json
 import re
 import nltk
@@ -99,9 +99,23 @@ def analyze():
             except:
                 print(f'Was not able to parse difficulty {i}.')
 
+        # The category modal is all-or-nothing: if it has been used (modalUsed == '1'),
+        # its three hidden fields are the single source of truth and an empty value
+        # means "no filter". Otherwise fall back to the legacy checkboxes. Mixing the
+        # two per-field produced contradictory category/subcategory pairs.
+        if request.form.get('modalUsed') == '1':
+            cat_str = request.form.get('categories', '')
+            sub_str = request.form.get('subcategories', '')
+            alt_str = request.form.get('alternateSubcategories', '')
+        else:
+            cat_str = ','.join(categories)
+            sub_str = ','.join([i for i in subcategories if i])
+            alt_str = ''
+
         payload = {
-            "categories": ','.join(categories),
-            "subcategories": ','.join([i for i in subcategories if i]),
+            "categories": cat_str,
+            "subcategories": sub_str,
+            "alternateSubcategories": alt_str,
             "difficulties": ','.join([str(i) for i in list(set(difficulties))]),
             "maxReturnLength": 200,
             "queryString": automaticForm.query.data,
@@ -114,7 +128,7 @@ def analyze():
 
         resp = requests.get('https://www.qbreader.org/api/query',
                              params=payload)
-        
+
         questions = [
             {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty', '_id') if info in i} for i in resp.json()['tossups']['questionArray']
         ]

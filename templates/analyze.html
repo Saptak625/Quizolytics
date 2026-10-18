@@ -5,8 +5,8 @@
 
 {% block body %}
   {{ super() }}
-  <h5>View Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5>
-  <div class="text-center">
+  <!-- <h5>View Usage Guide <a href="https://docs.google.com/document/d/1owFsCKhDUvF7T9SCQJTIQ-c1gQV6KgiIxk-d9Ufn7o4/edit?usp=sharing">Here</a>.</h5> -->
+  <div class="text-center mb-3">
     <div class="btn-group justify-content-center" role="group" aria-label="Basic radio toggle button group">
       <input type="radio" class="btn-check" name="btnradio" id="autosearch" autocomplete="off" onclick="showAutomatic()">
       <label class="btn btn-outline-primary" for="autosearch">Automatic Searching</label>
@@ -29,108 +29,52 @@
               {{ automaticForm.submit1(class="btn btn-primary btn-lg") }}
             </div>
         {% endif %}
-        <div class="mb-3 text-center">
+        <div class="mb-4 text-center">
           <label class="form-control-label mb-1" for="categories">Categories: </label>
-          <div class="btn-group d-block mb-2" role="group" id="categories">
-            {{ automaticForm.literature(class="btn-check", onclick="litSelect(this.checked)") }}
-            {{ automaticForm.literature.label(class="btn btn-outline-primary") }}
-  
-            {{ automaticForm.science(class="btn-check", onclick="sciSelect(this.checked)") }}
-            {{ automaticForm.science.label(class="btn btn-outline-danger") }}
-  
-            {{ automaticForm.fineArts(class="btn-check", onclick="faSelect(this.checked)") }}
-            {{ automaticForm.fineArts.label(class="btn btn-outline-warning") }}
-
-            {{ automaticForm.history(class="btn-check", onclick="hisSelect(this.checked)") }}
-            {{ automaticForm.history.label(class="btn btn-outline-success") }}
-            
-            {{ automaticForm.currentEvents(class="btn-check") }}
-            {{ automaticForm.currentEvents.label(class="btn btn-outline-success") }}
-            
-            {{ automaticForm.geography(class="btn-check") }}
-            {{ automaticForm.geography.label(class="btn btn-outline-success") }}
-            
-            {{ automaticForm.religion(class="btn-check") }}
-            {{ automaticForm.religion.label(class="btn btn-outline-info") }}
-            
-            {{ automaticForm.mythology(class="btn-check") }}
-            {{ automaticForm.mythology.label(class="btn btn-outline-info") }}
-  
-            {{ automaticForm.philosophy(class="btn-check") }}
-            {{ automaticForm.philosophy.label(class="btn btn-outline-info") }}
-            
-            {{ automaticForm.socialScience(class="btn-check") }}
-            {{ automaticForm.socialScience.label(class="btn btn-outline-info") }}
-            
-            {{ automaticForm.otherAcademic(class="btn-check") }}
-            {{ automaticForm.otherAcademic.label(class="btn btn-outline-secondary") }}
-            
-            {{ automaticForm.trash(class="btn-check") }}
-            {{ automaticForm.trash.label(class="btn btn-outline-secondary") }}
+          <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#category-modal">Open Category Modal</button>
+          <span class="text-muted small ms-2" id="categorySummary"></span>
+          <div class="d-none" id="categories">
+            {{ automaticForm.literature(class="btn-check", id="literature") }}
+            {{ automaticForm.science(class="btn-check", id="science") }}
+            {{ automaticForm.fineArts(class="btn-check", id="fineArts") }}
+            {{ automaticForm.history(class="btn-check", id="history") }}
+            {{ automaticForm.currentEvents(class="btn-check", id="currentEvents") }}
+            {{ automaticForm.geography(class="btn-check", id="geography") }}
+            {{ automaticForm.religion(class="btn-check", id="religion") }}
+            {{ automaticForm.mythology(class="btn-check", id="mythology") }}
+            {{ automaticForm.philosophy(class="btn-check", id="philosophy") }}
+            {{ automaticForm.socialScience(class="btn-check", id="socialScience") }}
+            {{ automaticForm.otherAcademic(class="btn-check", id="otherAcademic") }}
+            {{ automaticForm.trash(class="btn-check", id="trash") }}
           </div>
-          <label class="form-control-label mb-1" for="subcategories">Subcategories: </label>
-          <div class="btn-group d-block mb-2" role="group" id="subcategories">
-            {{ automaticForm.americanLit(class="btn-check") }}
-            {{ automaticForm.americanLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.britishLit(class="btn-check") }}
-            {{ automaticForm.britishLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.classicalLit(class="btn-check") }}
-            {{ automaticForm.classicalLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.europeanLit(class="btn-check") }}
-            {{ automaticForm.europeanLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.worldLit(class="btn-check") }}
-            {{ automaticForm.worldLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.otherLit(class="btn-check") }}
-            {{ automaticForm.otherLit.label(class="btn btn-sm btn-outline-primary") }}
-
-            {{ automaticForm.biology(class="btn-check") }}
-            {{ automaticForm.biology.label(class="btn btn-sm btn-outline-danger") }}
-
-            {{ automaticForm.chemistry(class="btn-check") }}
-            {{ automaticForm.chemistry.label(class="btn btn-sm btn-outline-danger") }}
-
-            {{ automaticForm.physics(class="btn-check") }}
-            {{ automaticForm.physics.label(class="btn btn-sm btn-outline-danger") }}
-
-            {{ automaticForm.math(class="btn-check") }}
-            {{ automaticForm.math.label(class="btn btn-sm btn-outline-danger") }}
-
-            {{ automaticForm.otherSci(class="btn-check") }}
-            {{ automaticForm.otherSci.label(class="btn btn-sm btn-outline-danger") }}
-
-            {{ automaticForm.visualFA(class="btn-check") }}
-            {{ automaticForm.visualFA.label(class="btn btn-sm btn-outline-warning") }}
-
-            {{ automaticForm.auditoryFA(class="btn-check") }}
-            {{ automaticForm.auditoryFA.label(class="btn btn-sm btn-outline-warning") }}
-
-            {{ automaticForm.otherFA(class="btn-check") }}
-            {{ automaticForm.otherFA.label(class="btn btn-sm btn-outline-warning") }}
-
-            {{ automaticForm.americanHis(class="btn-check") }}
-            {{ automaticForm.americanHis.label(class="btn btn-sm btn-outline-success") }}
-
-            {{ automaticForm.ancientHis(class="btn-check") }}
-            {{ automaticForm.ancientHis.label(class="btn btn-sm btn-outline-success") }}
-
-            {{ automaticForm.europeanHis(class="btn-check") }}
-            {{ automaticForm.europeanHis.label(class="btn btn-sm btn-outline-success") }}
-
-            {{ automaticForm.worldHis(class="btn-check") }}
-            {{ automaticForm.worldHis.label(class="btn btn-sm btn-outline-success") }}
-
-            {{ automaticForm.otherHis(class="btn-check") }}
-            {{ automaticForm.otherHis.label(class="btn btn-sm btn-outline-success") }}
+          <label class="form-control-label mb-1 mt-2 d-none" for="subcategories">Subcategories: </label>
+          <div class="d-none" id="subcategories">
+            {{ automaticForm.americanLit(class="btn-check", id="americanLit") }}
+            {{ automaticForm.britishLit(class="btn-check", id="britishLit") }}
+            {{ automaticForm.classicalLit(class="btn-check", id="classicalLit") }}
+            {{ automaticForm.europeanLit(class="btn-check", id="europeanLit") }}
+            {{ automaticForm.worldLit(class="btn-check", id="worldLit") }}
+            {{ automaticForm.otherLit(class="btn-check", id="otherLit") }}
+            {{ automaticForm.biology(class="btn-check", id="biology") }}
+            {{ automaticForm.chemistry(class="btn-check", id="chemistry") }}
+            {{ automaticForm.physics(class="btn-check", id="physics") }}
+            {{ automaticForm.math(class="btn-check", id="math") }}
+            {{ automaticForm.otherSci(class="btn-check", id="otherSci") }}
+            {{ automaticForm.visualFA(class="btn-check", id="visualFA") }}
+            {{ automaticForm.auditoryFA(class="btn-check", id="auditoryFA") }}
+            {{ automaticForm.otherFA(class="btn-check", id="otherFA") }}
+            {{ automaticForm.americanHis(class="btn-check", id="americanHis") }}
+            {{ automaticForm.ancientHis(class="btn-check", id="ancientHis") }}
+            {{ automaticForm.europeanHis(class="btn-check", id="europeanHis") }}
+            {{ automaticForm.worldHis(class="btn-check", id="worldHis") }}
+            {{ automaticForm.otherHis(class="btn-check", id="otherHis") }}
           </div>
-          <div>
-            <button type="button" class="btn btn-dark" onclick="selectAll(false)">Unselect All</button>
-            <button type="button" class="btn btn-dark" onclick="selectAll(true)">Select All</button>
-          </div>
+          <!-- Written by the category modal script. modalUsed=1 tells the backend to use these
+               three fields (empty = no filter) instead of the legacy checkboxes above. -->
+          <input type="hidden" name="modalUsed" id="modalUsedField" value="0">
+          <input type="hidden" name="categories" id="categoriesField" value="">
+          <input type="hidden" name="subcategories" id="subcategoriesField" value="">
+          <input type="hidden" name="alternateSubcategories" id="alternateSubcategoriesField" value="">
         </div>
 
         {{ automaticForm.difficulty.label(class="form-control-label") }}
@@ -140,7 +84,7 @@
                         <span class="invalid-feedback">{{ error }}</span>
                     {% endfor %}
             {% else %}
-                {{ automaticForm.difficulty(class="form-control mb-3") }}
+                {{ automaticForm.difficulty(class="form-control mb-4") }}
             {% endif %}
 
         {% if automaticForm.analyzeDetails.automatic.errors %}
@@ -154,7 +98,7 @@
         {% endif %}
         {{ automaticForm.analyzeDetails.automatic.label(class="form-check-label me-3") }}
       
-        <div class="ms-5">
+        <div class="ms-5 mb-4">
           <div id="automatic automatic group">
             {{ automaticForm.analyzeDetails.maxResults.label(class="form-control-label") }}
             {% if automaticForm.analyzeDetails.maxResults.errors %}
@@ -210,6 +154,31 @@
         </div>
     </div>
   </form>
+  <!-- Category Modal (qbreader-style). Columns are filled by script. -->
+  <div class="modal" id="category-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title me-2">Select Categories</h5>
+          <button type="button" class="btn btn-primary btn-sm me-2" id="toggle-all">Toggle all</button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-4" id="modal-categories">
+              <h5 class="text-center">Category</h5>
+            </div>
+            <div class="col-4" id="modal-subcategories">
+              <h5 class="text-center">Subcategory</h5>
+            </div>
+            <div class="col-4" id="modal-alt-subcategories">
+              <h5 class="text-center">Alternate <span class="d-none d-lg-inline">Subcategory</span></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <form method="POST" action="" enctype="multipart/form-data" id="manualForm" class="needs-validation" novalidate>
     {{ manualForm.hidden_tag() }}
     <div class="form-group">
@@ -289,12 +258,15 @@
           </div>
         </div>
     </div>
-    {{ manualForm.submit2(class="btn btn-primary") }}
+    <div class="text-center">
+      {{ manualForm.submit2(class="btn btn-primary btn-lg mt-2") }}
+    </div>
   </form>
 {% endblock body %}
 
 {% block results %}
 {{ super() }}
+{% block results_inner %}
 {% if data != None %}
 {% if noResults %}
 <h3 class="text-center">No Questions matched Query.</h3>
@@ -303,12 +275,12 @@
   <h5 class="lead text-center">If any clues are not properly filtered, namely they are just parts of the standard Quizbowl canon, please submit them to this <a href="https://forms.gle/3iiSSbspPfuEDvTe7">form</a>.</h5>
   <h5 class="lead text-center mb-4">Copy any clue by simply clicking on the clue card!</h5>
   <div class="text-center">
-  <h3>Unigrams Clues(By Frequency): </h3>
+  <h3>Unigrams Clues (By Frequency): </h3>
   {% if data[0] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[0] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -322,12 +294,12 @@
   {% else %}
   <h5>No unigrams found!</h5>
   {% endif %}
-  <h3 class="mt-3">Bigrams Clues(By PMI Score): </h3>
+  <h3 class="mt-3">Bigrams Clues (By PMI Score): </h3>
   {% if data[1] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[1] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -341,12 +313,12 @@
   {% else %}
   <h5>No bigrams found!</h5>
   {% endif %}
-  <h3 class="mt-3">Trigrams Clues(By PMI Score): </h3>
+  <h3 class="mt-3">Trigrams Clues (By PMI Score): </h3>
   {% if data[2] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[2] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -360,12 +332,12 @@
   {% else %}
   <h5>No Trigrams found!</h5>
   {% endif %}
-  <h3 class="mt-3">Quadgrams Clues(By PMI Score): </h3>
+  <h3 class="mt-3">Quadgrams Clues (By PMI Score): </h3>
   {% if data[3] %}
   <div class="row g-4 text-center justify-content-center mb-4">
     {% for e in data[3] %}
     <div class="col-sm-2">
-      <div class="card h-100" data-bs-toggle="tooltip" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')" onmouseleave="hideTooltip(this)">
+      <div class="card h-100" title="Copy!" data-bs-trigger="click" onclick="ngramClick(this, '{{e}}')">
         <div class="card-body">
           <p class="card-text">{{e}}</p>
         </div>
@@ -384,7 +356,7 @@
 <h3 class="mt-3">Questions: </h3>
 <p class="text-muted m-2"><b>{{questions.__len__()}} Questions Found</b></p>
 {% for t in questions %}
-<div class="card m-2 mb-4" onclick="questionClick(this, '{{t['_id']}}')" data-bs-toggle="tooltip" title="Copy question id" data-bs-trigger="click" onmouseleave="hideTooltip(this)">
+<div class="card m-2 mb-4">
     <div class="card-header">
         <b class="card-title">{{t['setName']}} | {{t['category']}} | {{t['subcategory']}} | {{t['difficulty']}}</b>
     </div>
@@ -404,10 +376,176 @@
 {% endfor %}
 {% endif %}
 {% endif %}
+{% endblock results_inner %}
 {% endblock results %}
 
 {% block script %}
   <script>
+    // ------------------------------------------------------------------
+    // QBReader-like category modal
+    //
+    // The modal owns its own state. Whenever anything changes, all three
+    // hidden fields (categories / subcategories / alternateSubcategories)
+    // are rewritten together from that state and modalUsed is set to 1, so
+    // the backend never mixes modal values with the legacy checkboxes.
+    // ------------------------------------------------------------------
+    // subs: [label, id of matching legacy checkbox or null]
+    // sameName: QBReader subcategory has the same name as the category
+    //           (matches what the legacy checkbox path always sent)
+    const CATEGORY_GROUPS = [
+      { name: 'Literature', color: 'primary', formId: 'literature',
+        subs: [['American Literature', 'americanLit'], ['British Literature', 'britishLit'],
+               ['Classical Literature', 'classicalLit'], ['European Literature', 'europeanLit'],
+               ['World Literature', 'worldLit'], ['Other Literature', 'otherLit']],
+        alts: ['Drama', 'Long Fiction', 'Poetry', 'Short Fiction', 'Misc Literature'] },
+      { name: 'History', color: 'success', formId: 'history',
+        subs: [['American History', 'americanHis'], ['Ancient History', 'ancientHis'],
+               ['European History', 'europeanHis'], ['World History', 'worldHis'],
+               ['Other History', 'otherHis']],
+        alts: [] },
+      { name: 'Science', color: 'danger', formId: 'science',
+        subs: [['Biology', 'biology'], ['Chemistry', 'chemistry'], ['Physics', 'physics'],
+               ['Other Science', 'otherSci']],
+        alts: ['Math', 'Astronomy', 'Computer Science', 'Earth Science', 'Engineering', 'Misc Science'] },
+      { name: 'Fine Arts', color: 'warning', formId: 'fineArts',
+        subs: [['Visual Fine Arts', 'visualFA'], ['Auditory Fine Arts', 'auditoryFA'],
+               ['Other Fine Arts', 'otherFA']],
+        alts: ['Architecture', 'Dance', 'Film', 'Jazz', 'Musicals', 'Opera', 'Photography', 'Misc Arts'] },
+      { name: 'Religion', color: 'secondary', formId: 'religion', sameName: true, subs: [], alts: [] },
+      { name: 'Mythology', color: 'secondary', formId: 'mythology', sameName: true, subs: [], alts: [] },
+      { name: 'Philosophy', color: 'secondary', formId: 'philosophy', sameName: true, subs: [], alts: [] },
+      { name: 'Social Science', color: 'secondary', formId: 'socialScience', sameName: true, subs: [],
+        alts: ['Anthropology', 'Economics', 'Linguistics', 'Psychology', 'Sociology', 'Other Social Science'] },
+      { name: 'Current Events', color: 'secondary', formId: 'currentEvents', sameName: true, subs: [], alts: [] },
+      { name: 'Geography', color: 'secondary', formId: 'geography', sameName: true, subs: [], alts: [] },
+      { name: 'Other Academic', color: 'secondary', formId: 'otherAcademic', sameName: true, subs: [], alts: [] },
+      // Legacy checkbox is called "trash"; the modal uses QBReader's newer name.
+      { name: 'Pop Culture', color: 'secondary', formId: 'trash',
+        subs: [['Movies', null], ['Music', null], ['Sports', null], ['Television', null],
+               ['Video Games', null], ['Other Pop Culture', null]],
+        alts: [] }
+    ];
+
+    // kind: 'cat' | 'sub' | 'alt'; g: group index; i: child index
+    const modalBox = (kind, g, i) =>
+      document.getElementById(i === undefined ? `modal-${kind}-${g}` : `modal-${kind}-${g}-${i}`);
+
+    function renderCategoryModal() {
+      const catRoot = document.getElementById('modal-categories');
+      const subRoot = document.getElementById('modal-subcategories');
+      const altRoot = document.getElementById('modal-alt-subcategories');
+      if (!catRoot || !subRoot || !altRoot) return;
+
+      const makeBtn = (id, label, color, data) => `
+        <div>
+          <input type="checkbox" class="btn-check" autocomplete="off" id="${id}" ${data}>
+          <label class="btn btn-outline-${color} w-100 rounded-0 my-1" for="${id}">${label}</label>
+        </div>`;
+
+      let catHtml = '<h5 class="text-center">Category</h5>';
+      let subHtml = '<h5 class="text-center">Subcategory</h5>';
+      let altHtml = '<h5 class="text-center">Alternate <span class="d-none d-lg-inline">Subcategory</span></h5>';
+      CATEGORY_GROUPS.forEach((group, g) => {
+        catHtml += makeBtn(`modal-cat-${g}`, group.name, group.color, `data-kind="cat" data-g="${g}"`);
+        group.subs.forEach(([label], i) => {
+          subHtml += makeBtn(`modal-sub-${g}-${i}`, label, group.color, `data-kind="sub" data-g="${g}" data-i="${i}"`);
+        });
+        group.alts.forEach((label, i) => {
+          altHtml += makeBtn(`modal-alt-${g}-${i}`, label, group.color, `data-kind="alt" data-g="${g}" data-i="${i}"`);
+        });
+      });
+      catRoot.innerHTML = catHtml;
+      subRoot.innerHTML = subHtml;
+      altRoot.innerHTML = altHtml;
+
+      // Initial state mirrors the legacy checkboxes (rendered once; the modal keeps its own state afterwards).
+      CATEGORY_GROUPS.forEach((group, g) => {
+        const catOn = !!document.getElementById(group.formId)?.checked;
+        modalBox('cat', g).checked = catOn;
+        group.subs.forEach(([, formId], i) => {
+          const legacy = formId ? document.getElementById(formId) : null;
+          modalBox('sub', g, i).checked = legacy ? legacy.checked : catOn;
+        });
+        group.alts.forEach((_, i) => { modalBox('alt', g, i).checked = catOn; });
+      });
+      updateCategorySummary(computeCategoryFilters().cats);
+
+      // One delegated listener handles every checkbox in the modal.
+      document.getElementById('category-modal').addEventListener('change', (e) => {
+        const t = e.target;
+        if (!t.matches || !t.matches('input[data-kind]')) return;
+        const g = Number(t.dataset.g);
+        const group = CATEGORY_GROUPS[g];
+        if (t.dataset.kind === 'cat') {
+          // Category toggles cascade to all of its children.
+          group.subs.forEach((_, i) => { modalBox('sub', g, i).checked = t.checked; });
+          group.alts.forEach((_, i) => { modalBox('alt', g, i).checked = t.checked; });
+        } else if (t.checked) {
+          // Checking a child turns its parent category on.
+          modalBox('cat', g).checked = true;
+        } else {
+          // Unchecking the last child turns the parent off.
+          const anyChild = group.subs.some((_, i) => modalBox('sub', g, i).checked)
+            || group.alts.some((_, i) => modalBox('alt', g, i).checked);
+          if (!anyChild) modalBox('cat', g).checked = false;
+        }
+        updateCategoryFields();
+      });
+
+      document.getElementById('toggle-all').addEventListener('click', () => {
+        const boxes = [...document.querySelectorAll('#category-modal input[data-kind]')];
+        const checkAll = boxes.some(b => !b.checked);
+        boxes.forEach(b => { b.checked = checkAll; });
+        updateCategoryFields();
+      });
+    }
+
+    // Derives the three API filters from the modal state.
+    // - categories: every checked category.
+    // - subcategories: for each checked category, its checked children (or all of them if none are
+    //   checked); "same name" categories contribute their own name. Every checked category
+    //   contributes, so QBReader's AND of category/subcategory never excludes a selected category.
+    // - alternateSubcategories: only for categories where a strict subset is selected. Selecting
+    //   all (or none) adds no alternate filter, so questions without an alternate subcategory
+    //   are not accidentally excluded.
+    function computeCategoryFilters() {
+      const cats = [], subs = [], alts = [];
+      CATEGORY_GROUPS.forEach((group, g) => {
+        if (!modalBox('cat', g).checked) return;
+        cats.push(group.name);
+        if (group.sameName) subs.push(group.name);
+        if (group.subs.length) {
+          let chosen = group.subs.filter((_, i) => modalBox('sub', g, i).checked).map(s => s[0]);
+          if (!chosen.length) chosen = group.subs.map(s => s[0]);
+          subs.push(...chosen);
+        }
+        if (group.alts.length) {
+          const chosen = group.alts.filter((_, i) => modalBox('alt', g, i).checked);
+          if (chosen.length && chosen.length < group.alts.length) alts.push(...chosen);
+        }
+      });
+      return { cats, subs, alts };
+    }
+
+    function updateCategorySummary(cats) {
+      const el = document.getElementById('categorySummary');
+      if (!el) return;
+      el.textContent = (cats.length === 0 || cats.length === CATEGORY_GROUPS.length)
+        ? 'All categories'
+        : cats.join(', ');
+    }
+
+    function updateCategoryFields() {
+      const { cats, subs, alts } = computeCategoryFilters();
+      document.getElementById('categoriesField').value = cats.join(',');
+      document.getElementById('subcategoriesField').value = subs.join(',');
+      document.getElementById('alternateSubcategoriesField').value = alts.join(',');
+      document.getElementById('modalUsedField').value = '1';
+      updateCategorySummary(cats);
+    }
+
+    renderCategoryModal();
+
     function loading() {
       const data = document.getElementById("data")
       if(data !== null){
@@ -418,24 +556,60 @@
       spinner.style.display = 'block';
     }
     
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    // Async submit with cancellation
+    let currentController = null;
+    async function submitWithAjax(form, fdOverride = null) {
+      if (currentController) currentController.abort();
+      currentController = new AbortController();
+      try {
+        const resp = await fetch(form.action || window.location.pathname, {
+          method: 'POST',
+          body: fdOverride || new FormData(form),
+          signal: currentController.signal
+        });
+        const html = await resp.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const newResultsInner = doc.getElementById('resultsContent');
+        const resultsInner = document.getElementById('resultsContent');
+        if (newResultsInner && resultsInner) {
+          resultsInner.innerHTML = newResultsInner.innerHTML;
+          const spinner = document.getElementById("loadSpinner");
+          if (spinner) spinner.style.display = 'none';
+          document.getElementById("scrollTo")?.scrollIntoView({ behavior: 'smooth' });
+          const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+          [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
+        }
+      } catch (e) {
+        if (e.name !== 'AbortError') console.error(e);
+      } finally {
+        currentController = null;
+      }
+    }
+
+    // Validation + ajax hook
     (() => {
-      'use strict'
-    
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
       const forms = document.querySelectorAll('.needs-validation')
-    
-      // Loop over them and prevent submission
       Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
+        form.addEventListener('submit', async event => {
+          event.preventDefault();
+          event.stopPropagation();
           if (!form.checkValidity()) {
-            event.preventDefault()
-            event.stopPropagation()
-          } else {
-            loading();
+            form.classList.add('was-validated');
+            return;
           }
-    
-          form.classList.add('was-validated')
+          // Ensure submit button name/value included (so backend sees submit1/submit2)
+          const fd = new FormData(form);
+          const submitter = event.submitter;
+          if (submitter && submitter.name) {
+            fd.append(submitter.name, submitter.value || '');
+          } else {
+            // Fallback: try common names
+            const fallbackBtn = form.querySelector('button[type="submit"],input[type="submit"]');
+            if (fallbackBtn && fallbackBtn.name) fd.append(fallbackBtn.name, fallbackBtn.value || '');
+          }
+          loading();
+          await submitWithAjax(form, fd);
+          form.classList.add('was-validated');
         }, false)
       })
     })()
@@ -523,20 +697,7 @@
       }
     }
 
-    function questionClick(ele, message) {
-      copyToClipboard(String.raw`${message}`)
-      ele.setAttribute("data-bs-original-title", String.raw`Copied question id to clipboard: ${message}`)
-    }
-    
-    function hideTooltip(ele) {
-      if(ele.getAttribute("data-bs-original-title") == "Copied!" || ele.getAttribute("data-bs-original-title") == "Opened in new tab!" ){
-        ele.click();
-        ele.setAttribute("data-bs-original-title", "Copy!");
-      } else if (ele.getAttribute("data-bs-original-title").includes("Copied question id")) {
-        ele.click();
-        ele.setAttribute("data-bs-original-title", "Copy question id");
-      }
-    }
+    // Removed click-to-copy question id to allow text selection
     const automaticForm = document.getElementById("automaticForm");
     const manualForm = document.getElementById("manualForm");
     function showAutomatic() {
@@ -556,47 +717,6 @@
       manualForm.style.display = 'block';
     }
 
-
-    const categories = document.getElementById("categories");
-    const subcategories = document.getElementById("subcategories");
-    
-    function selectAll(val) {
-      for(let i in categories.children){
-        categories.children[i].checked=val;
-      }
-      for(let i in subcategories.children){
-        subcategories.children[i].checked=val;
-      }
-    }
-
-    function litSelect(val) {
-      const subIds = ["americanLit", "britishLit", "classicalLit", "europeanLit", "worldLit", "otherLit"];
-      for(let i in subIds){
-        document.getElementById(subIds[i]).checked = val;
-      }      
-    }
-
-    function sciSelect(val) {
-      const subIds = ["biology", "chemistry", "physics", "math", "otherSci"];
-      for(let i in subIds){
-        document.getElementById(subIds[i]).checked = val;
-      }      
-    }
-
-    function faSelect(val) {
-      const subIds = ["visualFA", "auditoryFA", "otherFA"];
-      for(let i in subIds){
-        document.getElementById(subIds[i]).checked = val;
-      }      
-    }
-
-    function hisSelect(val) {
-      const subIds = ["americanHis", "ancientHis", "europeanHis", "worldHis", "otherHis"];
-      for(let i in subIds){
-        document.getElementById(subIds[i]).checked = val;
-      }      
-    }
-    
     {% if data != None %}
       const spinner = document.getElementById("loadSpinner");
       spinner.style.display = 'none';
