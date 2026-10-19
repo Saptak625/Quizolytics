@@ -1,4 +1,5 @@
 import hashlib
+import random
 
 # Function to generate shingles from a string
 def generate_shingles(s, k):
@@ -9,25 +10,31 @@ def generate_shingles(s, k):
     return shingles
 
 
-# Function to generate hash value using SHA-256
+# Function to generate a 64-bit hash value for a shingle
 def hash_value(item):
-    return int(hashlib.sha256(item.encode('utf-8')).hexdigest(), 16)
+    return int.from_bytes(hashlib.blake2b(item.encode('utf-8'), digest_size=8).digest(), 'big')
+
+
+# Fixed random 64-bit masks; XORing one base hash with each mask gives the
+# independent hash functions MinHash needs, so every shingle is hashed once
+# instead of once per hash function.
+_MASK_RNG = random.Random(625)
+HASH_MASKS = [_MASK_RNG.getrandbits(64) for _ in range(256)]
 
 
 # Function to create MinHash signature for a set of items
 def minhash_signature(items, num_hashes):
-    minhash_values = []
-    for i in range(num_hashes):
-        hash_values = [hash_value(str(item) + str(i)) for item in items]
-        minhash_values.append(min(hash_values))
-    return minhash_values
+    hashes = [hash_value(item) for item in items]
+    if not hashes:
+        return [0] * num_hashes
+    return [min(h ^ mask for h in hashes) for mask in HASH_MASKS[:num_hashes]]
 
 
 # Function to calculate Jaccard similarity between two sets
 def jaccard_similarity(set1, set2):
-    intersection = len(set1.intersection(set2))
-    union = len(set1.union(set2))
-    return intersection / float(union)
+    intersection = len(set1 & set2)
+    union = len(set1) + len(set2) - intersection
+    return intersection / float(union) if union else 1.0
 
 
 # Function to perform LSH and group similar sets together
