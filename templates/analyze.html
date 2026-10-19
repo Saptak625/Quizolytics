@@ -264,8 +264,6 @@
   </form>
 {% endblock body %}
 
-{% block results %}
-{{ super() }}
 {% block results_inner %}
 {% if data != None %}
 {% if noResults %}
@@ -376,7 +374,6 @@
 {% endif %}
 {% endif %}
 {% endblock results_inner %}
-{% endblock results %}
 
 {% block script %}
   <script>
