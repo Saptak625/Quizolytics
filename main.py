@@ -128,10 +128,30 @@ def analyze():
 
         resp = requests.get('https://www.qbreader.org/api/query',
                              params=payload)
+        
+        # The qbreader API now returns the set/packet as nested objects, the
+        # question/answer as formatted HTML, and plain-text `*_sanitized`
+        # copies. Normalize each tossup into the shape the template expects.
+        def normalize_tossup(i):
+            set_info = i.get('set') or {}
+            packet_info = i.get('packet') or {}
+            return {
+                '_id': i.get('_id'),
+                'number': i.get('number'),
+                'question': i.get('question_sanitized') or i.get('question', ''),
+                'formatted_question': i.get('question', ''),
+                'answer': i.get('answer_sanitized') or i.get('answer', ''),
+                'formatted_answer': i.get('formatted_answer') or i.get('answer', ''),
+                'setName': i.get('setName') or set_info.get('name', ''),
+                'packetName': i.get('packetName') or packet_info.get('name', ''),
+                'packetNumber': i.get('packetNumber') or packet_info.get('number'),
+                'category': i.get('category', ''),
+                'subcategory': i.get('subcategory', ''),
+                'alternate_subcategory': i.get('alternate_subcategory', ''),
+                'difficulty': i.get('difficulty', ''),
+            }
 
-        questions = [
-            {info: i[info] for info in ('question', 'formatted_answer', 'answer', 'setName', 'category', 'subcategory', 'difficulty', '_id') if info in i} for i in resp.json()['tossups']['questionArray']
-        ]
+        questions = [normalize_tossup(i) for i in resp.json()['tossups']['questionArray']]
         texts = [i['question'] for i in questions]
 
         MAX_RESULTS = automaticForm.analyzeDetails.maxResults.data
@@ -363,4 +383,4 @@ def analyze():
                            questions=questions)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=81, debug=True)
+    app.run(host="0.0.0.0", port=int(__import__("os").environ.get("PORT", 81)), debug=True)
