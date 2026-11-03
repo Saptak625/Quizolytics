@@ -14,18 +14,18 @@
       <label class="btn btn-outline-primary" for="manualsearch">Manual Searching</label>
     </div>
   </div>
-  <form method="POST" action="" enctype="multipart/form-data" id="automaticForm" class="needs-validation" novalidate>
-    {{ automaticForm.hidden_tag() }}
+  <form method="GET" action="{{ url_for('analyze') }}" id="automaticForm" class="needs-validation" novalidate>
+
     <div class="form-group">
-        {{ automaticForm.query.label(class="form-control-label") }}
-        {% if automaticForm.query.errors %}
-            {{ automaticForm.query(class="form-control is-invalid") }}
-                {% for error in automaticForm.query.errors %}
+        {{ automaticForm.q.label(class="form-control-label") }}
+        {% if automaticForm.q.errors %}
+            {{ automaticForm.q(class="form-control is-invalid") }}
+                {% for error in automaticForm.q.errors %}
                     <span class="invalid-feedback">{{ error }}</span>
                 {% endfor %}
         {% else %}
             <div class="input-group mb-3">
-              {{ automaticForm.query(class="form-control form-control-lg") }}
+              {{ automaticForm.q(class="form-control form-control-lg") }}
               {{ automaticForm.submit1(class="btn btn-primary btn-lg") }}
             </div>
         {% endif %}
@@ -71,10 +71,10 @@
           </div>
           <!-- Written by the category modal script. modalUsed=1 tells the backend to use these
                three fields (empty = no filter) instead of the legacy checkboxes above. -->
-          <input type="hidden" name="modalUsed" id="modalUsedField" value="0">
-          <input type="hidden" name="categories" id="categoriesField" value="">
-          <input type="hidden" name="subcategories" id="subcategoriesField" value="">
-          <input type="hidden" name="alternateSubcategories" id="alternateSubcategoriesField" value="">
+          <input type="hidden" name="modalUsed" id="modalUsedField" value="{{ request.args.get('modalUsed', '0') }}">
+          <input type="hidden" name="categories" id="categoriesField" value="{{ request.args.get('categories', '') }}">
+          <input type="hidden" name="subcategories" id="subcategoriesField" value="{{ request.args.get('subcategories', '') }}">
+          <input type="hidden" name="alternateSubcategories" id="alternateSubcategoriesField" value="{{ request.args.get('alternateSubcategories', '') }}">
         </div>
 
         {{ automaticForm.difficulty.label(class="form-control-label") }}
@@ -179,7 +179,7 @@
       </div>
     </div>
   </div>
-  <form method="POST" action="" enctype="multipart/form-data" id="manualForm" class="needs-validation" novalidate>
+  <form method="POST" action="{{ url_for('analyze') }}" enctype="multipart/form-data" id="manualForm" class="needs-validation" novalidate>
     {{ manualForm.hidden_tag() }}
     <div class="form-group">
         {{ manualForm.jsonFile.label(class="form-control-label") }}
@@ -457,15 +457,19 @@
       subRoot.innerHTML = subHtml;
       altRoot.innerHTML = altHtml;
 
+      const restored = document.getElementById('modalUsedField').value === '1';
+      const selected = id => document.getElementById(id).value.split(',').filter(Boolean);
+      const cats = selected('categoriesField'), subs = selected('subcategoriesField');
+      const alts = selected('alternateSubcategoriesField');
       // Initial state mirrors the legacy checkboxes (rendered once; the modal keeps its own state afterwards).
       CATEGORY_GROUPS.forEach((group, g) => {
-        const catOn = !!document.getElementById(group.formId)?.checked;
+        const catOn = restored ? cats.includes(group.name) : !!document.getElementById(group.formId)?.checked;
         modalBox('cat', g).checked = catOn;
-        group.subs.forEach(([, formId], i) => {
+        group.subs.forEach(([label, formId], i) => {
           const legacy = formId ? document.getElementById(formId) : null;
-          modalBox('sub', g, i).checked = legacy ? legacy.checked : catOn;
+          modalBox('sub', g, i).checked = restored ? subs.includes(label) : (legacy ? legacy.checked : catOn);
         });
-        group.alts.forEach((_, i) => { modalBox('alt', g, i).checked = catOn; });
+        group.alts.forEach((label, i) => { modalBox('alt', g, i).checked = restored ? catOn && (!alts.length || alts.includes(label)) : catOn; });
       });
       updateCategorySummary(computeCategoryFilters().cats);
 
@@ -590,6 +594,7 @@
       const forms = document.querySelectorAll('.needs-validation')
       Array.from(forms).forEach(form => {
         form.addEventListener('submit', async event => {
+          if (form.id === 'automaticForm') return;
           event.preventDefault();
           event.stopPropagation();
           if (!form.checkValidity()) {
@@ -650,45 +655,7 @@
     function ngramClick(ele, message) {
       // Check if Shift key is down.
       if (window.event.shiftKey) {
-        // Open a new analyze tab with the query as the ngram.
-        // Send a POST request to the analyze page with the query as the ngram.
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/analyze';
-        form.target = '_blank';
-        form.style.display = 'none';
-        const query = document.createElement('input');
-        query.type = 'text';
-        query.name = 'query';
-        query.value = message;
-        form.appendChild(query);
-        const categories = document.createElement('input');
-        categories.type = 'text';
-        categories.name = 'categories';
-        categories.value = 'all';
-        form.appendChild(categories);
-        const subcategories = document.createElement('input');
-        subcategories.type = 'text';
-        subcategories.name = 'subcategories';
-        subcategories.value = 'all';
-        form.appendChild(subcategories);
-        const difficulty = document.createElement('input');
-        difficulty.type = 'text';
-        difficulty.name = 'difficulty';
-        difficulty.value = '';
-        form.appendChild(difficulty);
-        const analyzeDetails = document.createElement('input'); 
-        analyzeDetails.type = 'checkbox';
-        analyzeDetails.name = 'analyzeDetails-automatic';
-        analyzeDetails.checked = true;
-        form.appendChild(analyzeDetails);
-        const maxResults = document.createElement('input');
-        maxResults.type = 'text';
-        maxResults.name = 'analyzeDetails-maxResults';
-        maxResults.value = '15';
-        analyzeDetails.appendChild(maxResults);
-        document.body.appendChild(form);
-        form.submit();
+        window.open('/analyze?q=' + encodeURIComponent(message), '_blank');
         ele.setAttribute("data-bs-original-title", "Opened in new tab!");
       } else {
         copyToClipboard(String.raw`${message}`)

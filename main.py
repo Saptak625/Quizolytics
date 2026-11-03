@@ -20,7 +20,19 @@ def index():
 
 @app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
-    automaticForm = AutomaticAnalyzeForm()
+    search_args = request.args.copy()
+    if request.method == 'GET' and 'q' in search_args:
+        # A short link uses the same defaults as the initial form.
+        if len(request.args) == 1:
+            defaults = AutomaticAnalyzeForm()
+            for field in defaults:
+                if field.type == 'BooleanField' and field.data:
+                    search_args[field.name] = 'y'
+            for field in defaults.analyzeDetails:
+                if field.data is not None:
+                    search_args[field.name] = str(field.data)
+        search_args['submit1'] = 'Search'
+    automaticForm = AutomaticAnalyzeForm(formdata=search_args if 'q' in search_args else None)
     manualForm = ManualAnalyzeForm()
     showAutomatic = True
     data = None
@@ -84,7 +96,7 @@ def analyze():
             "Trash" if automaticForm.trash.data else ''
         ]
 
-        difficultiesStr = automaticForm.difficulty.data
+        difficultiesStr = automaticForm.difficulty.data or ''
         difficultiesSplit = difficultiesStr.split(',')
         difficulties = [i for i in difficultiesSplit if i and '-' not in i]
         for i in difficultiesSplit:
@@ -103,10 +115,10 @@ def analyze():
         # its three hidden fields are the single source of truth and an empty value
         # means "no filter". Otherwise fall back to the legacy checkboxes. Mixing the
         # two per-field produced contradictory category/subcategory pairs.
-        if request.form.get('modalUsed') == '1':
-            cat_str = request.form.get('categories', '')
-            sub_str = request.form.get('subcategories', '')
-            alt_str = request.form.get('alternateSubcategories', '')
+        if request.values.get('modalUsed') == '1':
+            cat_str = request.values.get('categories', '')
+            sub_str = request.values.get('subcategories', '')
+            alt_str = request.values.get('alternateSubcategories', '')
         else:
             cat_str = ','.join(categories)
             sub_str = ','.join([i for i in subcategories if i])
@@ -118,7 +130,7 @@ def analyze():
             "alternateSubcategories": alt_str,
             "difficulties": ','.join([str(i) for i in list(set(difficulties))]),
             "maxReturnLength": 200,
-            "queryString": automaticForm.query.data,
+            "queryString": automaticForm.q.data,
             "questionType": "tossup",
             "randomize": False,
             "regex": False,
