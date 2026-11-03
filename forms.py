@@ -14,7 +14,7 @@ class AnalyzeDetailForm(FlaskForm):
 
 
 class AutomaticAnalyzeForm(FlaskForm):
-    query = StringField("Answerline Search: ",
+    q = StringField("Answerline Search: ",
                         render_kw={"placeholder": "Query"}, validators=[DataRequired()])
     literature = BooleanField("Literature", default="checked")
     science = BooleanField("Science", default="checked")
